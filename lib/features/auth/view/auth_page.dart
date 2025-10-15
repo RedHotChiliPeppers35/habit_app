@@ -75,12 +75,6 @@ class _AuthPageState extends State<AuthPage> {
                                       'email': user.email,
                                     });
                                   }
-
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Logged in successfully'),
-                                    ),
-                                  );
                                 }
                               } on AuthException catch (e) {
                                 final msg = e.message.toLowerCase();

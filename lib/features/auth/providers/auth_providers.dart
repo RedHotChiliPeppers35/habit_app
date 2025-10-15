@@ -7,7 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 final authSessionProvider = StreamProvider<Session?>((ref) {
   final client = Supabase.instance.client;
 
-  // Emit current session first
+  // Emit current session firstd
   final controller = StreamController<Session?>();
   controller.add(client.auth.currentSession);
 
