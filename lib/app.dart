@@ -22,9 +22,7 @@ class MyApp extends ConsumerWidget {
               body: Center(child: CircularProgressIndicator()),
             ),
         error: (e, _) => Scaffold(body: Center(child: Text('Auth error: $e'))),
-        data:
-            (session) =>
-                session == null ? const AuthPage() : const HabitsPage(),
+        data: (session) => session == null ? const AuthPage() : MainPage(),
       ),
     );
   }
