@@ -114,10 +114,12 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
               // Habit Name
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Habit Name',
                   prefixIcon: Icon(Icons.title),
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
@@ -148,6 +150,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
                         margin: const EdgeInsets.symmetric(horizontal: 8),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
+
                           color:
                               isSelected
                                   ? AppColors.primaryBlue
@@ -175,10 +178,12 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
               // Frequency Dropdown
               DropdownButtonFormField<String>(
                 value: _selectedFrequency,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Frequency',
                   prefixIcon: Icon(Icons.repeat),
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                 ),
                 items: const [
                   DropdownMenuItem(value: 'daily', child: Text('Daily')),
@@ -196,10 +201,12 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
               // Description
               TextFormField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Description (Optional)',
                   prefixIcon: Icon(Icons.description),
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                 ),
                 maxLines: 3,
               ),
@@ -217,20 +224,23 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
               const SizedBox(height: 30),
 
               // Submit Button
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.accentRed,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 75),
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.accentRed,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
+                  icon: const Icon(Icons.check, color: Colors.white),
+                  label: const Text(
+                    'Add Habit',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                  onPressed: _saveHabit,
                 ),
-                icon: const Icon(Icons.check, color: Colors.white),
-                label: const Text(
-                  'Add Habit',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
-                onPressed: _saveHabit,
               ),
             ],
           ),

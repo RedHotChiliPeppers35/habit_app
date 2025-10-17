@@ -107,7 +107,10 @@ class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
   @override
   Widget build(BuildContext context) {
     final habitsAsync = ref.watch(habitsProvider);
-
+    final pageTitle =
+        widget.frequency == 'all'
+            ? 'All Habits'
+            : '${widget.frequency[0].toUpperCase()}${widget.frequency.substring(1)} Habits';
     return Scaffold(
       backgroundColor: AppColors.backgroundCream,
       appBar: AppBar(
@@ -127,7 +130,11 @@ class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
         error: (e, _) => Center(child: Text('Error loading habits: $e')),
         data: (habits) {
           final filteredHabits =
-              habits.where((h) => h.frequency == widget.frequency).toList();
+              widget.frequency == 'all'
+                  ? habits
+                  : habits
+                      .where((h) => h.frequency == widget.frequency)
+                      .toList();
 
           if (filteredHabits.isEmpty) {
             return Center(

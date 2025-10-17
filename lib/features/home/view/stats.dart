@@ -50,7 +50,6 @@ class StatsPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 🌟 Stylish Centered Profile Button
                 Center(
                   child: TextButton(
                     onPressed: () {
@@ -120,7 +119,15 @@ class StatsPage extends ConsumerWidget {
                 const SizedBox(height: 16),
 
                 _buildStatCard(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (_) => const FilteredHabitsPage(frequency: 'all'),
+                      ),
+                    );
+                  },
                   icon: Icons.bar_chart,
                   label: 'Total Habits',
                   value: '$totalHabits',

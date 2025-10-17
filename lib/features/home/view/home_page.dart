@@ -252,7 +252,7 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                           ),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(30),
                             border: Border.all(
                               color: AppColors.backgroundCream,
                               width: 1.5,
@@ -354,7 +354,7 @@ class HorizontalDateSelector extends ConsumerWidget {
               margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
               decoration: BoxDecoration(
                 color: isSelected ? AppColors.accentRed : Colors.white,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(30),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
