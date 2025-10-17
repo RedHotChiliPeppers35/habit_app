@@ -1,7 +1,7 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+bool showSignIn = true;
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -11,8 +11,6 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
-  bool showSignIn = true;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,14 +89,19 @@ class _AuthPageState extends State<AuthPage> {
                                             'Login failed: ${e.message}',
                                           ),
                                         );
-                                if (mounted)
+                                if (mounted) {
                                   ScaffoldMessenger.of(
                                     context,
                                   ).showSnackBar(snack);
+                                }
                               }
                             },
                           )
-                          : const _SignUpForm(),
+                          : _SignUpForm(
+                            // This function will be called on successful sign-up
+                            onSignUpSuccess:
+                                () => setState(() => showSignIn = true),
+                          ),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -124,8 +127,8 @@ class _AuthPageState extends State<AuthPage> {
 }
 
 class _SignUpForm extends StatefulWidget {
-  const _SignUpForm();
-
+  final VoidCallback onSignUpSuccess;
+  const _SignUpForm({required this.onSignUpSuccess});
   @override
   State<_SignUpForm> createState() => _SignUpFormState();
 }
@@ -150,54 +153,48 @@ class _SignUpFormState extends State<_SignUpForm> {
     _phoneController.dispose();
     super.dispose();
   }
+  // In auth_page.dart -> class _SignUpFormState
 
   Future<void> _signUpUser(String email, String password) async {
-    final supabase = Supabase.instance.client;
+    // Add a mounted check for safety, especially with async operations
+    if (!mounted) return;
+
     try {
-      // 🔍 Check if email already exists
-      final result = await supabase.rpc(
-        'email_exists',
-        params: {'p_email': email},
+      final supabase = Supabase.instance.client;
+
+      // Sign up the user and pass the additional data
+      final res = await supabase.auth.signUp(
+        email: email,
+        password: password,
+        // This 'data' is passed as raw_user_meta_data to your trigger
+        data: {
+          'name': _nameController.text.trim(),
+          'surname': _surnameController.text.trim(),
+          'phone': _phoneController.text.trim(),
+        },
       );
-      final exists = result == true;
 
-      if (exists) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('This email is already registered.')),
-        );
-        return;
-      }
-
-      // ✅ Attempt sign-up
-      final res = await supabase.auth.signUp(email: email, password: password);
-      final user = res.user;
-
-      if (user == null) {
-        if (!mounted) return;
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Check your email to confirm your account.'),
+            content: Text(
+              'Account created! Please check your email to confirm.',
+            ),
           ),
         );
-        return;
-      }
 
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Account created. Please confirm your email.'),
-        ),
-      );
+        widget.onSignUpSuccess();
+      }
     } on AuthException catch (e) {
-      log('AuthException: $e');
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Sign-up failed: ${e.message}')));
     } catch (e) {
-      log('Unexpected: $e');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Unexpected error: $e')));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An unexpected error occurred: $e')),
+      );
     }
   }
 

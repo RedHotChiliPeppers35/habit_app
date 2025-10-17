@@ -111,6 +111,10 @@ class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
     return Scaffold(
       backgroundColor: AppColors.backgroundCream,
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: Navigator.of(context).pop,
+          icon: Icon(Icons.chevron_left, color: Colors.white, size: 35),
+        ),
         backgroundColor: AppColors.primaryBlue,
         title: Text(
           '${widget.frequency[0].toUpperCase()}${widget.frequency.substring(1)} Habits',

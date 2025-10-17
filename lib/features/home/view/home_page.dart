@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -7,6 +8,7 @@ import 'package:habit_app/core/providers/habit_service_provider.dart';
 import 'package:habit_app/features/home/view/add_habit.dart';
 import 'package:habit_app/features/home/providers/habit_provider.dart';
 import 'package:habit_app/features/home/view/profile.dart';
+import 'package:habit_app/features/home/view/stats.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -164,7 +166,14 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
       appBar: AppBar(
         leading: IconButton(
           padding: EdgeInsets.all(16),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).push(
+              CupertinoDialogRoute(
+                builder: (context) => ProfilePage(),
+                context: context,
+              ),
+            );
+          },
           icon: Icon(Icons.person, color: Colors.white),
         ),
         backgroundColor: AppColors.primaryBlue,
