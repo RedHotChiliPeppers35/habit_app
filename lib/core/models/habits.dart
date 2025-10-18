@@ -6,6 +6,7 @@ class Habit {
   final String frequency;
   final String? icon;
   final bool notificationEnabled;
+  final DateTime startDate; // This was your new field
   final DateTime createdAt;
   DateTime? lastCompletedAt;
 
@@ -13,6 +14,7 @@ class Habit {
     required this.id,
     required this.userId,
     required this.name,
+    required this.startDate, // Make sure it's in the constructor
     this.description,
     required this.frequency,
     this.icon,
@@ -21,19 +23,19 @@ class Habit {
     this.lastCompletedAt,
   });
 
-  bool isCompletedOn(DateTime date) {
-    if (lastCompletedAt == null) return false;
-    return lastCompletedAt!.year == date.year &&
-        lastCompletedAt!.month == date.month &&
-        lastCompletedAt!.day == date.day;
-  }
+  // --- I RECOMMEND YOU REMOVE THIS METHOD ---
+  // It conflicts with your app's logic of checking the 'habit_logs' table.
+  // bool isCompletedOn(DateTime date) { ... }
+  // ---
 
   Map<String, dynamic> toMap() {
     return {
-      if (id.isNotEmpty) 'id': id, // ✅ Keep for updates, skip for inserts
+      if (id.isNotEmpty) 'id': id,
       'user_id': userId,
       'name': name,
       'description': description,
+      // --- FIX: Use snake_case and convert to string ---
+      'start_date': startDate.toIso8601String(),
       'frequency': frequency,
       'icon': icon,
       'notification_enabled': notificationEnabled,
@@ -48,6 +50,8 @@ class Habit {
       userId: map['user_id'],
       name: map['name'],
       description: map['description'],
+      // --- FIX: Use snake_case and parse from string ---
+      startDate: DateTime.parse(map['start_date'] as String),
       frequency: map['frequency'],
       icon: map['icon'],
       notificationEnabled: map['notification_enabled'] ?? false,
@@ -55,7 +59,7 @@ class Habit {
       lastCompletedAt:
           map['last_completed_at'] != null
               ? DateTime.parse(map['last_completed_at'])
-              : null, // ✅ renamed
+              : null,
     );
   }
 }

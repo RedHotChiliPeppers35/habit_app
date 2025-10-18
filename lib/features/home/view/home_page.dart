@@ -27,23 +27,29 @@ class _MainPageState extends ConsumerState<MainPage> {
   Widget build(BuildContext context) {
     final currentIndex = ref.watch(bottomNavIndexProvider);
     final isAddHabitSelected = currentIndex == 1;
+    final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundCream,
       body: _pages[currentIndex],
 
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          ref.read(bottomNavIndexProvider.notifier).state = 1;
-        },
+      floatingActionButton:
+          isKeyboardVisible
+              ? null
+              : FloatingActionButton(
+                onPressed: () {
+                  ref.read(bottomNavIndexProvider.notifier).state = 1;
+                },
 
-        backgroundColor:
-            isAddHabitSelected ? AppColors.accentRed : AppColors.primaryBlue,
-        foregroundColor: Colors.white,
-        elevation: 4.0,
-        shape: const CircleBorder(),
-        child: const Icon(Icons.add, size: 30),
-      ),
+                backgroundColor:
+                    isAddHabitSelected
+                        ? AppColors.accentRed
+                        : AppColors.primaryBlue,
+                foregroundColor: Colors.white,
+                elevation: 4.0,
+                shape: const CircleBorder(),
+                child: const Icon(Icons.add, size: 30),
+              ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
       bottomNavigationBar: BottomAppBar(
@@ -326,6 +332,7 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
         id: habit.id,
         userId: habit.userId,
         name: nameController.text.trim(),
+        startDate: habit.startDate,
         description: newDescription.isEmpty ? null : newDescription,
         frequency: selectedFrequency,
         icon: selectedIconCodePoint,
@@ -507,7 +514,6 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
 
     final supabase = Supabase.instance.client;
 
-    // 1. Get all completed logs for this habit, newest first
     final logs = await supabase
         .from('habit_logs')
         .select('date')
@@ -519,17 +525,31 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
       return 0; // No completions, no streak
     }
 
-    final dates = logs.map((log) => DateTime.parse(log['date'])).toList();
+    final allDates = logs.map((log) => DateTime.parse(log['date'])).toList();
+    final dates = <DateTime>[];
+    for (final date in allDates) {
+      final dateOnly = DateUtils.dateOnly(date);
+      if (!dates.contains(dateOnly)) {
+        dates.add(dateOnly);
+      }
+    }
+
+    // If, after de-duping, the list is empty, return 0.
+    if (dates.isEmpty) {
+      return 0;
+    }
 
     // 2. Check if the streak is "active"
-    // (i.e., completed today or yesterday)
     final today = DateUtils.dateOnly(DateTime.now());
     final yesterday = today.subtract(const Duration(days: 1));
 
-    // If the most recent completion wasn't today or yesterday, the streak is 0
-    if (dates[0] != today && dates[0] != yesterday) {
+    // --- THIS IS THE CORRECTED LOGIC ---
+    // If the most recent completion (dates[0]) was *before* yesterday,
+    // the streak is broken and should be 0.
+    if (dates[0].isBefore(yesterday)) {
       return 0;
     }
+    // --- END OF FIX ---
 
     // 3. Count the consecutive days
     int streak = 1; // Start at 1 for the most recent log
@@ -601,7 +621,6 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
           final selectedIndex = ref.watch(selectedDateIndexProvider);
           final today = DateTime.now();
           final selectedDate = today.add(Duration(days: selectedIndex));
-
           final todayDateOnly = DateUtils.dateOnly(today);
           final selectedDateOnly = DateUtils.dateOnly(selectedDate);
           String progressTitle;
@@ -614,9 +633,14 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
             progressTitle =
                 "Progress for ${DateFormat('MMM d').format(selectedDate)}";
           }
-
           final filteredHabits =
               habits.where((habit) {
+                if (DateUtils.dateOnly(
+                  habit.startDate,
+                ).isAfter(selectedDateOnly)) {
+                  return false;
+                }
+
                 switch (habit.frequency) {
                   case 'daily':
                     return true;
@@ -650,7 +674,6 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                     final progress = total == 0 ? 0 : completed / total;
 
                     return Container(
-                      // ... (existing container styling)
                       margin: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 8,
@@ -692,7 +715,6 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                           ),
                           const SizedBox(height: 10),
                           ClipRRect(
-                            // ... (existing LinearProgressIndicator)
                             borderRadius: BorderRadius.circular(10),
                             child: LinearProgressIndicator(
                               value: progress.toDouble(),
@@ -720,7 +742,10 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                             _buildActionButton(
                               icon: Icons.edit,
                               color: AppColors.primaryBlue,
-                              onPressed: () => _editHabit(habit),
+                              onPressed: () async {
+                                Slidable.of(context)?.close();
+                                await _editHabit(habit);
+                              },
                             ),
                             _buildActionButton(
                               icon: Icons.delete,
@@ -825,18 +850,35 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
   Widget _buildActionButton({
     required IconData icon,
     required Color color,
-    required VoidCallback onPressed,
+    required Future<void> Function() onPressed,
   }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: IconButton(
-        icon: Icon(icon, color: Colors.white),
-        onPressed: onPressed,
-      ),
+    return Builder(
+      builder: (context) {
+        return Container(
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: IconButton(
+            icon: Icon(icon, color: Colors.white),
+            onPressed: () async {
+              // 🔹 Immediately close slidable before opening dialog
+              final slidable = Slidable.of(context);
+              slidable?.close();
+
+              // 🔹 Run the action (dialog, edit, delete etc.)
+              await onPressed();
+
+              // 🔹 Re-close after action finishes or user dismisses dialog
+              //    (catches "outside tap" dismissal too)
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                slidable?.close();
+              });
+            },
+          ),
+        );
+      },
     );
   }
 }

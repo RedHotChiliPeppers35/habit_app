@@ -17,63 +17,6 @@ class FilteredHabitsPage extends ConsumerStatefulWidget {
 }
 
 class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
-  Future<void> _editHabit(Habit habit) async {
-    final nameController = TextEditingController(text: habit.name);
-    final freqController = TextEditingController(text: habit.frequency);
-
-    final result = await showDialog<bool>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Edit Habit'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Habit Name'),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: freqController,
-                  decoration: const InputDecoration(labelText: 'Frequency'),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryBlue,
-                ),
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Save'),
-              ),
-            ],
-          ),
-    );
-
-    if (result == true && mounted) {
-      final updatedHabit = Habit(
-        id: habit.id,
-        userId: habit.userId,
-        name: nameController.text.trim(),
-        description: habit.description,
-        frequency: freqController.text.trim(),
-        icon: habit.icon,
-        notificationEnabled: habit.notificationEnabled,
-        createdAt: habit.createdAt,
-      );
-
-      final habitService = ref.read(habitServiceProvider);
-      await habitService.updateHabit(updatedHabit);
-      ref.invalidate(habitsProvider);
-    }
-  }
-
   Future<void> _deleteHabit(String habitId) async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -156,7 +99,7 @@ class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
                       _buildActionButton(
                         icon: Icons.edit,
                         color: AppColors.primaryBlue,
-                        onPressed: () => _editHabit(habit),
+                        onPressed: () => showEditHabitDialog(context, habit),
                       ),
                       _buildActionButton(
                         icon: Icons.delete,
@@ -238,4 +181,248 @@ class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
       ),
     );
   }
+}
+
+Future<IconData?> showIconPicker(BuildContext context) async {
+  // Define a list of icons to choose from
+  final List<IconData> icons = [
+    Icons.fitness_center,
+    Icons.book,
+    Icons.water_drop,
+    Icons.run_circle,
+    Icons.laptop,
+    Icons.phone,
+    Icons.bedtime,
+    Icons.lightbulb,
+    Icons.palette,
+    Icons.music_note,
+    Icons.edit,
+    Icons.code,
+    Icons.pets,
+    Icons.star,
+    Icons.favorite,
+    Icons.shopping_cart,
+    Icons.hail,
+    Icons.spa,
+    Icons.coffee,
+    Icons.savings,
+  ];
+
+  return showDialog<IconData>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Select an Icon'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: GridView.builder(
+            shrinkWrap: true,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 5,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
+            itemCount: icons.length,
+            itemBuilder: (context, index) {
+              final icon = icons[index];
+              return InkWell(
+                onTap: () => Navigator.pop(context, icon),
+                borderRadius: BorderRadius.circular(12),
+                child: Icon(icon, size: 30, color: AppColors.primaryBlue),
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, null),
+            child: const Text('Cancel'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+/// Displays the "Edit Habit" dialog.
+/// Returns the updated [Habit] object if saved, or null if canceled.
+Future<Habit?> showEditHabitDialog(BuildContext context, Habit habit) async {
+  final nameController = TextEditingController(text: habit.name);
+  final descriptionController = TextEditingController(text: habit.description);
+  String selectedFrequency = habit.frequency;
+  String? selectedIconCodePoint = habit.icon;
+  // --- IMPORTANT: Keep track of the original start date ---
+  final DateTime selectedStartDate = habit.startDate;
+
+  // The showDialog call now returns a Habit?
+  return showDialog<Habit>(
+    context: context,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, dialogSetState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: const Text(
+              'Edit Habit',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            content: SingleChildScrollView(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.8,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        labelText: 'Habit Name',
+                        labelStyle: const TextStyle(color: Colors.black54),
+                        filled: true,
+                        fillColor: Colors.grey.shade100,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: AppColors.backgroundCream,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.primaryBlue),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: descriptionController,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        labelText: 'Description (Optional)',
+                        labelStyle: const TextStyle(color: Colors.black54),
+                        filled: true,
+                        fillColor: Colors.grey.shade100,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: AppColors.backgroundCream,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.primaryBlue),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      value: selectedFrequency,
+                      decoration: InputDecoration(
+                        labelText: 'Frequency',
+                        labelStyle: const TextStyle(color: Colors.black54),
+                        filled: true,
+                        fillColor: Colors.grey.shade100,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: AppColors.backgroundCream,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.primaryBlue),
+                        ),
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: 'daily', child: Text('Daily')),
+                        DropdownMenuItem(
+                          value: 'weekly',
+                          child: Text('Weekly'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'monthly',
+                          child: Text('Monthly'),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) selectedFrequency = value;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(
+                        selectedIconCodePoint != null
+                            ? IconData(
+                              int.parse(selectedIconCodePoint!),
+                              fontFamily: 'MaterialIcons',
+                            )
+                            : Icons.emoji_emotions_outlined,
+                        color: AppColors.primaryBlue,
+                        size: 30,
+                      ),
+                      title: const Text('Change Icon'),
+                      trailing: const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 16,
+                      ),
+                      onTap: () async {
+                        // Call the other public function
+                        final IconData? newIcon = await showIconPicker(context);
+                        if (newIcon != null) {
+                          dialogSetState(() {
+                            selectedIconCodePoint =
+                                newIcon.codePoint.toString();
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                // --- MODIFIED: Return null on Cancel ---
+                onPressed: () => Navigator.pop(context, null),
+                style: TextButton.styleFrom(foregroundColor: Colors.black54),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryBlue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                // --- MODIFIED: Return the new Habit object on Save ---
+                onPressed: () {
+                  final newDescription = descriptionController.text.trim();
+                  final updatedHabit = Habit(
+                    id: habit.id,
+                    userId: habit.userId,
+                    name: nameController.text.trim(),
+                    startDate: selectedStartDate, // Use the stored start date
+                    description: newDescription.isEmpty ? null : newDescription,
+                    frequency: selectedFrequency,
+                    icon: selectedIconCodePoint,
+                    notificationEnabled: habit.notificationEnabled,
+                    createdAt: habit.createdAt,
+                    lastCompletedAt: habit.lastCompletedAt,
+                  );
+                  Navigator.pop(context, updatedHabit);
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
 }
