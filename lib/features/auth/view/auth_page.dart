@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_app/core/services/push_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 bool showSignIn = true;
@@ -51,6 +52,7 @@ class _AuthPageState extends State<AuthPage> {
                                       email: email,
                                       password: password,
                                     );
+                                // await PushService.initAndRegisterToken();
                                 if (res.user != null && mounted) {
                                   final supabase = Supabase.instance.client;
                                   final user = res.user!;
@@ -163,7 +165,7 @@ class _SignUpFormState extends State<_SignUpForm> {
       final supabase = Supabase.instance.client;
 
       // Sign up the user and pass the additional data
-      final res = await supabase.auth.signUp(
+      await supabase.auth.signUp(
         email: email,
         password: password,
         // This 'data' is passed as raw_user_meta_data to your trigger

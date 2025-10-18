@@ -4,9 +4,10 @@ class Habit {
   final String name;
   final String? description;
   final String frequency;
-  final String? icon; // new
-  final bool notificationEnabled; // new
+  final String? icon;
+  final bool notificationEnabled;
   final DateTime createdAt;
+  DateTime? lastCompletedAt;
 
   Habit({
     required this.id,
@@ -17,11 +18,19 @@ class Habit {
     this.icon,
     this.notificationEnabled = false,
     required this.createdAt,
+    this.lastCompletedAt,
   });
+
+  bool isCompletedOn(DateTime date) {
+    if (lastCompletedAt == null) return false;
+    return lastCompletedAt!.year == date.year &&
+        lastCompletedAt!.month == date.month &&
+        lastCompletedAt!.day == date.day;
+  }
 
   Map<String, dynamic> toMap() {
     return {
-      if (id.isNotEmpty) 'id': id,
+      if (id.isNotEmpty) 'id': id, // ✅ Keep for updates, skip for inserts
       'user_id': userId,
       'name': name,
       'description': description,
@@ -29,6 +38,7 @@ class Habit {
       'icon': icon,
       'notification_enabled': notificationEnabled,
       'created_at': createdAt.toIso8601String(),
+      'last_completed_at': lastCompletedAt?.toIso8601String(),
     };
   }
 
@@ -42,6 +52,10 @@ class Habit {
       icon: map['icon'],
       notificationEnabled: map['notification_enabled'] ?? false,
       createdAt: DateTime.parse(map['created_at']),
+      lastCompletedAt:
+          map['last_completed_at'] != null
+              ? DateTime.parse(map['last_completed_at'])
+              : null, // ✅ renamed
     );
   }
 }

@@ -107,10 +107,6 @@ class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
   @override
   Widget build(BuildContext context) {
     final habitsAsync = ref.watch(habitsProvider);
-    final pageTitle =
-        widget.frequency == 'all'
-            ? 'All Habits'
-            : '${widget.frequency[0].toUpperCase()}${widget.frequency.substring(1)} Habits';
     return Scaffold(
       backgroundColor: AppColors.backgroundCream,
       appBar: AppBar(
