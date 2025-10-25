@@ -34,7 +34,6 @@ class Habit {
       'user_id': userId,
       'name': name,
       'description': description,
-      // --- FIX: Use snake_case and convert to string ---
       'start_date': startDate.toIso8601String(),
       'frequency': frequency,
       'icon': icon,
@@ -50,7 +49,6 @@ class Habit {
       userId: map['user_id'],
       name: map['name'],
       description: map['description'],
-      // --- FIX: Use snake_case and parse from string ---
       startDate: DateTime.parse(map['start_date'] as String),
       frequency: map['frequency'],
       icon: map['icon'],

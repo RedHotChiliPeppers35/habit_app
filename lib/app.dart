@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_app/features/auth/providers/auth_providers.dart';
 import 'package:habit_app/features/auth/view/auth_page.dart';
-import 'package:habit_app/features/home/view/home_page.dart';
+import 'package:habit_app/features/home/view/home_page/home_page.dart';
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -12,9 +12,13 @@ class MyApp extends ConsumerWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+
       theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
+        scaffoldBackgroundColor: const Color(0xFF6A7EFC),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF6A7EFC),
+          background: const Color(0xFF6A7EFC),
+        ),
       ),
       home: sessionAsync.when(
         loading:

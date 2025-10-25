@@ -46,3 +46,5 @@ app.*.map.json
 
 # Environment file
 .env
+
+/Users/ataberkcinetci/Desktop/habit_app/ios/Runner/GoogleService-Info.plist

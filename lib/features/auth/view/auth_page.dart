@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:habit_app/core/services/push_service.dart';
+import 'package:habit_app/core/models/contants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 bool showSignIn = true;
@@ -15,6 +15,7 @@ class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundCream,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -115,7 +116,10 @@ class _AuthPageState extends State<AuthPage> {
                     ),
                     TextButton(
                       onPressed: () => setState(() => showSignIn = !showSignIn),
-                      child: Text(showSignIn ? 'Sign Up!' : 'Log In!'),
+                      child: Text(
+                        showSignIn ? 'Sign Up!' : 'Log In!',
+                        style: TextStyle(color: AppColors.accentRed),
+                      ),
                     ),
                   ],
                 ),
@@ -211,7 +215,9 @@ class _SignUpFormState extends State<_SignUpForm> {
             controller: _nameController,
             decoration: const InputDecoration(
               labelText: 'Name',
-              border: OutlineInputBorder(),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(30)),
+              ),
             ),
             validator: (v) => v == null || v.isEmpty ? 'Enter your name' : null,
           ),
@@ -220,7 +226,9 @@ class _SignUpFormState extends State<_SignUpForm> {
             controller: _surnameController,
             decoration: const InputDecoration(
               labelText: 'Surname',
-              border: OutlineInputBorder(),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(30)),
+              ),
             ),
             validator:
                 (v) => v == null || v.isEmpty ? 'Enter your surname' : null,
@@ -231,7 +239,9 @@ class _SignUpFormState extends State<_SignUpForm> {
             keyboardType: TextInputType.phone,
             decoration: const InputDecoration(
               labelText: 'Phone',
-              border: OutlineInputBorder(),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(30)),
+              ),
             ),
             validator:
                 (v) =>
@@ -242,7 +252,9 @@ class _SignUpFormState extends State<_SignUpForm> {
             controller: _emailController,
             decoration: const InputDecoration(
               labelText: 'Email',
-              border: OutlineInputBorder(),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(30)),
+              ),
             ),
             validator: (v) {
               if (v == null || v.isEmpty) return 'Enter email';
@@ -256,7 +268,9 @@ class _SignUpFormState extends State<_SignUpForm> {
             obscureText: !_passwordVisible,
             decoration: InputDecoration(
               labelText: 'Password',
-              border: const OutlineInputBorder(),
+              border: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(30)),
+              ),
               suffixIcon: IconButton(
                 icon: Icon(
                   _passwordVisible ? Icons.visibility : Icons.visibility_off,
@@ -274,7 +288,9 @@ class _SignUpFormState extends State<_SignUpForm> {
             obscureText: !_passwordVisible,
             decoration: const InputDecoration(
               labelText: 'Confirm Password',
-              border: OutlineInputBorder(),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(30)),
+              ),
             ),
             validator:
                 (v) =>
@@ -283,7 +299,11 @@ class _SignUpFormState extends State<_SignUpForm> {
                         : "Passwords don’t match",
           ),
           const SizedBox(height: 20),
-          ElevatedButton(
+
+          FilledButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(AppColors.primaryBlue),
+            ),
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 await _signUpUser(
@@ -340,7 +360,9 @@ class _SignInFormState extends State<_SignInForm> {
             controller: _emailController,
             decoration: const InputDecoration(
               labelText: 'Email',
-              border: OutlineInputBorder(),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(30)),
+              ),
             ),
             validator: (v) {
               if (v == null || v.isEmpty) return 'Enter email';
@@ -357,19 +379,30 @@ class _SignInFormState extends State<_SignInForm> {
                 obscureText: true,
                 decoration: const InputDecoration(
                   labelText: 'Password',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(30)),
+                  ),
                 ),
                 validator:
                     (v) => v == null || v.isEmpty ? 'Enter password' : null,
               ),
               TextButton(
                 onPressed: () {},
-                child: const Text('Forgot Password?'),
+                child: const Text(
+                  'Forgot Password?',
+                  style: TextStyle(color: AppColors.accentRed),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-          ElevatedButton(onPressed: _submit, child: const Text('Log In')),
+          FilledButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(AppColors.primaryBlue),
+            ),
+            onPressed: _submit,
+            child: const Text('Log In'),
+          ),
           const SizedBox(height: 15),
         ],
       ),
