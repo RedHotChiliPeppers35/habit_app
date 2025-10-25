@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyBT0Ictw8GuS3hXehtbCvNmikiahFxP8D8</string>
+	<string>AIzaSyBqQt3wWCw4iSguAS_ek4jSp-MKwjhyDps</string>
 	<key>GCM_SENDER_ID</key>
-	<string>503611800139</string>
+	<string>98428045707</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.habitApp</string>
+	<string>com.striveyTech.habitApp</string>
 	<key>PROJECT_ID</key>
-	<string>habitapp-98af1</string>
+	<string>habitapp-8b7df</string>
 	<key>STORAGE_BUCKET</key>
-	<string>habitapp-98af1.firebasestorage.app</string>
+	<string>habitapp-8b7df.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:503611800139:ios:b8d4373f1f4df4af626bce</string>
+	<string>1:98428045707:ios:b7fbc2a988e41b3e52478e</string>
 </dict>
 </plist>
