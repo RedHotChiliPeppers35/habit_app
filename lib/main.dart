@@ -37,13 +37,10 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
 
-  // Initialize Supabase
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
 
-  // Initialize Firebase safely
   await safeInitializeFirebase();
 
-  // 🧩 Retrieve FCM token (skip APNs on simulator)
   try {
     final messaging = FirebaseMessaging.instance;
     final fcmToken = await messaging.getToken();
@@ -63,6 +60,5 @@ Future<void> main() async {
   } catch (e) {
     print('⚠️ Firebase Messaging init error: $e');
   }
-
   runApp(const ProviderScope(child: AuthLinkHandler(child: MyApp())));
 }

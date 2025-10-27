@@ -29,6 +29,8 @@ dependencies:
   firebase_messaging: ^15.1.0
   fl_chart: ^0.68.0
   flutter_native_splash: ^2.4.7
+  google_generative_ai: ^0.4.3
+  dash_chat_2: ^0.0.19
 
 dev_dependencies:
   flutter_test:

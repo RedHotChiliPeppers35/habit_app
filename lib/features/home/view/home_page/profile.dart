@@ -15,10 +15,7 @@ class ProfilePage extends ConsumerWidget {
       backgroundColor: AppColors.backgroundCream,
       appBar: AppBar(
         backgroundColor: AppColors.primaryBlue,
-        leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 30),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        leading: BackButton(color: Colors.white),
         title: const Text(
           'Your Profile',
           style: TextStyle(color: Colors.white),
@@ -35,7 +32,6 @@ class ProfilePage extends ConsumerWidget {
           if (profile == null) {
             return const Center(child: Text('No user profile found.'));
           }
-
           final username = profile['name'] ?? 'No Name';
           final surname = profile['surname'] ?? '';
           final email = profile['email'] ?? 'No Email';

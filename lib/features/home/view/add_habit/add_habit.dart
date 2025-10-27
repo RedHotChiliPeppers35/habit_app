@@ -28,13 +28,14 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
   final Map<String, IconData> _availableIcons = const {
     'Sleep': Icons.nightlight_round,
     'Water': Icons.water_drop,
+    'Work': Icons.laptop,
+    'Health': Icons.favorite,
     'Fitness': Icons.fitness_center,
     'Read': Icons.menu_book,
     'Run': Icons.run_circle,
     'Meditate': Icons.self_improvement,
     'Diet': Icons.fastfood,
     'Art': Icons.brush,
-    'Love': Icons.favorite,
   };
 
   Future<void> _saveHabit() async {
@@ -106,212 +107,212 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
       },
       child: Scaffold(
         backgroundColor: AppColors.backgroundCream,
-        appBar: AppBar(
-          backgroundColor: AppColors.primaryBlue,
-          title: const Text(
-            'Add New Habit',
-            style: TextStyle(color: Colors.white),
-          ),
-          centerTitle: true,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
-          ),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              children: [
-                _buildCard(
-                  padding: const EdgeInsets.all(
-                    16,
-                  ), // This card needs more padding
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Choose an Icon',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        height: 80,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: _availableIcons.length,
-                          itemBuilder: (context, index) {
-                            final name = _availableIcons.keys.elementAt(index);
-                            final icon = _availableIcons.values.elementAt(
-                              index,
-                            );
-                            final isSelected = icon == _selectedIcon;
 
-                            return GestureDetector(
-                              onTap: () => setState(() => _selectedIcon = icon),
-                              child: Container(
-                                padding: EdgeInsets.all(2),
-                                width: 70,
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color:
-                                      isSelected
-                                          ? AppColors.primaryBlue
-                                          : Colors.grey.shade200,
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      icon,
-                                      color:
-                                          isSelected
-                                              ? Colors.white
-                                              : Colors.black54,
-                                      size: 32,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Padding(
-                                      padding: EdgeInsetsGeometry.symmetric(
-                                        horizontal: 10,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                children: [
+                  SizedBox(height: 20),
+                  _buildCard(
+                    padding: const EdgeInsets.all(
+                      16,
+                    ), // This card needs more padding
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Choose an Icon',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          height: 80,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _availableIcons.length,
+                            itemBuilder: (context, index) {
+                              final name = _availableIcons.keys.elementAt(
+                                index,
+                              );
+                              final icon = _availableIcons.values.elementAt(
+                                index,
+                              );
+                              final isSelected = icon == _selectedIcon;
+
+                              return GestureDetector(
+                                onTap:
+                                    () => setState(() => _selectedIcon = icon),
+                                child: Container(
+                                  padding: EdgeInsets.all(2),
+                                  width: 70,
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:
+                                        isSelected
+                                            ? AppColors.accentRed
+                                            : Colors.grey.shade200,
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        icon,
+                                        color:
+                                            isSelected
+                                                ? Colors.white
+                                                : Colors.black54,
+                                        size: 32,
                                       ),
-                                      child: Text(
-                                        textAlign: TextAlign.center,
-                                        name,
-                                        maxLines: 3,
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w600,
-                                          color:
-                                              isSelected
-                                                  ? Colors.white
-                                                  : Colors.black54,
+                                      const SizedBox(height: 4),
+                                      Padding(
+                                        padding: EdgeInsetsGeometry.symmetric(
+                                          horizontal: 10,
                                         ),
-                                        overflow: TextOverflow.ellipsis,
+                                        child: Text(
+                                          textAlign: TextAlign.center,
+                                          name,
+                                          maxLines: 3,
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w600,
+                                            color:
+                                                isSelected
+                                                    ? Colors.white
+                                                    : Colors.black54,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  _buildCard(
+                    child: TextFormField(
+                      controller: _nameController,
+                      decoration: InputDecoration(
+                        labelText: 'Habit Name',
+                        prefixIcon: Icon(Icons.title),
+                        border: InputBorder.none,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Please enter a habit name';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  _buildCard(
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedFrequency,
+                      decoration: InputDecoration(
+                        labelText: 'Frequency',
+                        prefixIcon: Icon(Icons.repeat),
+                        border: InputBorder.none,
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: 'daily', child: Text('Daily')),
+                        DropdownMenuItem(
+                          value: 'weekly',
+                          child: Text('Weekly'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'monthly',
+                          child: Text('Monthly'),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => _selectedFrequency = value);
+                        }
+                      },
+                    ),
+                  ),
+                  _buildCard(
+                    padding: EdgeInsets.zero, // ListTile has its own padding
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 16,
+                      ),
+                      leading: Icon(
+                        Icons.calendar_today_outlined,
+                        color: AppColors.primaryBlue,
+                      ),
+                      title: const Text('Start Date'),
+                      subtitle: Text(
+                        DateFormat('E, MMM d, yyyy').format(_selectedDate),
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      trailing: const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 16,
+                      ),
+                      onTap: () async {
+                        final newDate = await showDatePicker(
+                          context: context,
+                          initialDate: _selectedDate,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime(2100),
+                        );
+                        if (newDate != null) {
+                          setState(() {
+                            _selectedDate = newDate;
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                  _buildCard(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                    child: TextFormField(
+                      controller: _descriptionController,
+                      decoration: InputDecoration(
+                        labelText: 'Description (Optional)',
+                        prefixIcon: Icon(Icons.description),
+
+                        border: InputBorder.none,
+                      ),
+                      maxLines: 3,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 75),
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryBlue,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                _buildCard(
-                  child: TextFormField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      labelText: 'Habit Name',
-                      prefixIcon: Icon(Icons.title),
-                      border: InputBorder.none,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter a habit name';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                _buildCard(
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedFrequency,
-                    decoration: InputDecoration(
-                      labelText: 'Frequency',
-                      prefixIcon: Icon(Icons.repeat),
-                      border: InputBorder.none,
-                    ),
-                    items: const [
-                      DropdownMenuItem(value: 'daily', child: Text('Daily')),
-                      DropdownMenuItem(value: 'weekly', child: Text('Weekly')),
-                      DropdownMenuItem(
-                        value: 'monthly',
-                        child: Text('Monthly'),
+                      icon: const Icon(Icons.check, color: Colors.white),
+                      label: const Text(
+                        'Add Habit',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
                       ),
-                    ],
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() => _selectedFrequency = value);
-                      }
-                    },
+                      onPressed: _saveHabit,
+                    ),
                   ),
-                ),
-                _buildCard(
-                  padding: EdgeInsets.zero, // ListTile has its own padding
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 16,
-                    ),
-                    leading: Icon(
-                      Icons.calendar_today_outlined,
-                      color: AppColors.primaryBlue,
-                    ),
-                    title: const Text('Start Date'),
-                    subtitle: Text(
-                      DateFormat('E, MMM d, yyyy').format(_selectedDate),
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    trailing: const Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 16,
-                    ),
-                    onTap: () async {
-                      final newDate = await showDatePicker(
-                        context: context,
-                        initialDate: _selectedDate,
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime(2100),
-                      );
-                      if (newDate != null) {
-                        setState(() {
-                          _selectedDate = newDate;
-                        });
-                      }
-                    },
-                  ),
-                ),
-                _buildCard(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                  child: TextFormField(
-                    controller: _descriptionController,
-                    decoration: InputDecoration(
-                      labelText: 'Description (Optional)',
-                      prefixIcon: Icon(Icons.description),
-
-                      border: InputBorder.none,
-                    ),
-                    maxLines: 3,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 75),
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.accentRed,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    icon: const Icon(Icons.check, color: Colors.white),
-                    label: const Text(
-                      'Add Habit',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                    onPressed: _saveHabit,
-                  ),
-                ),
-              ],
+                  SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
         ),

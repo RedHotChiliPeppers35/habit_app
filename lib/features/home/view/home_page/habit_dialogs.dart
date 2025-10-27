@@ -6,7 +6,7 @@ import 'package:habit_app/core/models/contants.dart';
 import 'package:habit_app/core/models/habits.dart';
 import 'package:habit_app/core/providers/habit_service_provider.dart';
 import 'package:habit_app/features/home/providers/habit_provider.dart';
-import 'package:habit_app/features/home/view/home_page/home_page.dart';
+import 'package:habit_app/features/home/view/chat/chat_screen.dart';
 import 'package:habit_app/features/home/view/home_page/profile.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -130,7 +130,6 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                       ),
                       const SizedBox(height: 16),
 
-                      // --- Frequency dropdown ---
                       DropdownButtonFormField<String>(
                         value: selectedFrequency,
                         decoration: InputDecoration(
@@ -171,7 +170,6 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                       ),
                       const SizedBox(height: 16),
 
-                      // --- Start Date picker ---
                       ListTile(
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 8,
@@ -209,7 +207,6 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                       ),
                       const SizedBox(height: 16),
 
-                      // --- Icon picker ---
                       ListTile(
                         contentPadding: EdgeInsets.zero,
                         leading: Icon(
@@ -301,26 +298,16 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
 
   Future<IconData?> _showIconPicker(BuildContext context) async {
     final List<IconData> icons = [
-      Icons.fitness_center,
-      Icons.book,
+      Icons.nightlight_round,
       Icons.water_drop,
-      Icons.run_circle,
       Icons.laptop,
-      Icons.phone,
-      Icons.bedtime,
-      Icons.lightbulb,
-      Icons.palette,
-      Icons.music_note,
-      Icons.edit,
-      Icons.code,
-      Icons.pets,
-      Icons.star,
       Icons.favorite,
-      Icons.shopping_cart,
-      Icons.hail,
-      Icons.spa,
-      Icons.coffee,
-      Icons.savings,
+      Icons.fitness_center,
+      Icons.menu_book,
+      Icons.run_circle,
+      Icons.self_improvement,
+      Icons.fastfood,
+      Icons.brush,
     ];
 
     return showDialog<IconData>(
@@ -518,7 +505,7 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
               ),
             );
           },
-          icon: const Icon(Icons.person, color: Colors.white),
+          icon: const Icon(CupertinoIcons.person_fill, color: Colors.white),
         ),
         backgroundColor: AppColors.primaryBlue,
         shape: const RoundedRectangleBorder(
@@ -527,39 +514,17 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
         title: const Text('My Habits', style: TextStyle(color: Colors.white)),
         actions: [
           IconButton(
+            padding: EdgeInsets.all(10),
             onPressed: () async {
-              final shouldSignOut = await showDialog<bool>(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: Text('Sign Out'),
-                    content: Text('Are you sure you want to sign out?'),
-                    actions: [
-                      TextButton(
-                        child: Text('Cancel'),
-                        onPressed: () {
-                          Navigator.of(context).pop(false);
-                        },
-                      ),
-                      TextButton(
-                        child: Text('Sign Out'),
-                        onPressed: () async {
-                          _signOut();
-                          Navigator.of(context).pop(true);
-                        },
-                      ),
-                    ],
-                  );
-                },
+              Navigator.of(context).push(
+                CupertinoModalPopupRoute(
+                  builder: (context) {
+                    return HabitChatPage();
+                  },
+                ),
               );
-
-              if (shouldSignOut == true) {
-                // Final sign-out behavior (like navigation)
-                // Example:
-                // Navigator.pushReplacementNamed(context, '/login');
-              }
             },
-            icon: Icon(Icons.logout, color: Colors.white),
+            icon: Icon(CupertinoIcons.chat_bubble_2_fill, color: Colors.white),
           ),
         ],
       ),
@@ -569,10 +534,31 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
         error: (e, _) => Center(child: Text('Error loading habits: $e')),
         data: (habits) {
           if (habits.isEmpty) {
-            return const Center(
-              child: Text(
-                'You don’t have habits yet.',
-                style: TextStyle(fontSize: 25),
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'You don’t have habits yet.',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                        AppColors.accentRed,
+                      ),
+                    ),
+
+                    onPressed: () {
+                      ref.read(bottomNavIndexProvider.notifier).state = 1;
+                    },
+                    child: Text(
+                      "Create One",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
               ),
             );
           }
@@ -888,4 +874,35 @@ class HorizontalDateSelector extends ConsumerWidget {
       ),
     );
   }
+}
+
+Widget buildActionButton({
+  required IconData icon,
+  required Color color,
+  required Future<void> Function() onPressed,
+}) {
+  return Builder(
+    builder: (context) {
+      return Container(
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: IconButton(
+          icon: Icon(icon, color: Colors.white),
+          onPressed: () async {
+            final slidable = Slidable.of(context);
+            slidable?.close();
+
+            await onPressed();
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              slidable?.close();
+            });
+          },
+        ),
+      );
+    },
+  );
 }

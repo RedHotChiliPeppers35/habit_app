@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:habit_app/core/models/contants.dart';
 import 'package:habit_app/features/home/view/add_habit/add_habit.dart';
 import 'package:habit_app/features/home/providers/habit_provider.dart';
@@ -28,7 +27,7 @@ class _MainPageState extends ConsumerState<MainPage> {
       body: _pages[currentIndex],
 
       floatingActionButton:
-          isKeyboardVisible
+          isKeyboardVisible || isAddHabitSelected
               ? null
               : FloatingActionButton(
                 onPressed: () {
@@ -50,14 +49,13 @@ class _MainPageState extends ConsumerState<MainPage> {
         color: AppColors.accentDark,
         shape: const CircularNotchedRectangle(),
         notchMargin: 8.0,
-
         child: Row(
           children: <Widget>[
             _buildBottomNavItem(
               context,
               ref: ref,
-              icon: Icons.home,
-              label: 'Home',
+              icon: Icons.check,
+              label: 'Habits',
               index: 0,
               currentIndex: currentIndex,
             ),
@@ -107,35 +105,4 @@ class _MainPageState extends ConsumerState<MainPage> {
       ),
     );
   }
-}
-
-Widget buildActionButton({
-  required IconData icon,
-  required Color color,
-  required Future<void> Function() onPressed,
-}) {
-  return Builder(
-    builder: (context) {
-      return Container(
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: IconButton(
-          icon: Icon(icon, color: Colors.white),
-          onPressed: () async {
-            final slidable = Slidable.of(context);
-            slidable?.close();
-
-            await onPressed();
-
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              slidable?.close();
-            });
-          },
-        ),
-      );
-    },
-  );
 }

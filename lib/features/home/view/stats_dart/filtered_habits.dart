@@ -5,7 +5,7 @@ import 'package:habit_app/core/models/contants.dart';
 import 'package:habit_app/features/home/providers/habit_provider.dart';
 import 'package:habit_app/core/models/habits.dart';
 import 'package:habit_app/core/providers/habit_service_provider.dart';
-import 'package:habit_app/features/home/view/home_page/home_page.dart';
+import 'package:habit_app/features/home/view/home_page/habit_dialogs.dart';
 import 'package:intl/intl.dart';
 
 class FilteredHabitsPage extends ConsumerStatefulWidget {
@@ -63,7 +63,7 @@ class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
           builder: (context, dialogSetState) {
             return AlertDialog(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(30),
               ),
               title: const Text(
                 'Edit Habit',
@@ -87,13 +87,13 @@ class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
                           filled: true,
                           fillColor: Colors.grey.shade100,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide(
                               color: AppColors.backgroundCream,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide(
                               color: AppColors.primaryBlue,
                             ),
@@ -110,13 +110,13 @@ class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
                           filled: true,
                           fillColor: Colors.grey.shade100,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide(
                               color: AppColors.backgroundCream,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide(
                               color: AppColors.primaryBlue,
                             ),
@@ -132,13 +132,13 @@ class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
                           filled: true,
                           fillColor: Colors.grey.shade100,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide(
                               color: AppColors.backgroundCream,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide(
                               color: AppColors.primaryBlue,
                             ),
@@ -207,7 +207,7 @@ class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
                     backgroundColor: AppColors.primaryBlue,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                   ),
                   onPressed: () => Navigator.pop(context, true),
@@ -290,7 +290,7 @@ class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
                     // and return the selected icon
                     Navigator.pop(context, icon);
                   },
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(30),
                   child: Icon(icon, size: 30, color: AppColors.primaryBlue),
                 );
               },
@@ -375,7 +375,7 @@ class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(30),
                       border: Border.all(
                         color: Colors.grey.shade300,
                         width: 1.5,

@@ -116,7 +116,20 @@ class StatisticsPage extends ConsumerWidget {
                         borderData: FlBorderData(show: false),
                         titlesData: FlTitlesData(
                           leftTitles: AxisTitles(
-                            sideTitles: SideTitles(showTitles: false),
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 36,
+                              getTitlesWidget: (value, meta) {
+                                return Text(
+                                  "${(value * 100).toInt()}%",
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black54,
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                           rightTitles: AxisTitles(
                             sideTitles: SideTitles(showTitles: false),
@@ -303,112 +316,7 @@ class StatisticsPage extends ConsumerWidget {
           const SizedBox(height: 20),
           _buildCard(
             context: context,
-            title: "Habits per Frequency",
-            infoText:
-                "A simple comparison of how many habits you’ve set as daily, weekly, or monthly. It helps you spot if you’re overloading yourself or keeping a healthy balance.",
-            child: _animatedChart(
-              SizedBox(
-                height: 200,
-                child: BarChart(
-                  BarChartData(
-                    barTouchData: BarTouchData(enabled: false),
-                    gridData: FlGridData(show: true),
-                    borderData: FlBorderData(show: false),
-                    titlesData: FlTitlesData(
-                      topTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      rightTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 28,
-                          getTitlesWidget: (value, meta) {
-                            if (value % 1 == 0) {
-                              return Text(
-                                value.toInt().toString(),
-                                style: const TextStyle(fontSize: 10),
-                              );
-                            }
-                            return const SizedBox.shrink();
-                          },
-                        ),
-                      ),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 28,
-                          getTitlesWidget: (value, meta) {
-                            switch (value.toInt()) {
-                              case 0:
-                                return const Text(
-                                  'Daily',
-                                  style: TextStyle(fontSize: 12),
-                                );
-                              case 1:
-                                return const Text(
-                                  'Weekly',
-                                  style: TextStyle(fontSize: 12),
-                                );
-                              case 2:
-                                return const Text(
-                                  'Monthly',
-                                  style: TextStyle(fontSize: 12),
-                                );
-                              default:
-                                return const SizedBox.shrink();
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                    barGroups: [
-                      BarChartGroupData(
-                        x: 0,
-                        barRods: [
-                          BarChartRodData(
-                            toY: dailyCount,
-                            color: AppColors.primaryBlue,
-                          ),
-                        ],
-                      ),
-                      BarChartGroupData(
-                        x: 1,
-                        barRods: [
-                          BarChartRodData(
-                            toY: weeklyCount,
-                            color: Colors.greenAccent,
-                          ),
-                        ],
-                      ),
-                      BarChartGroupData(
-                        x: 2,
-                        barRods: [
-                          BarChartRodData(
-                            toY: monthlyCount,
-                            color: AppColors.accentRed,
-                          ),
-                        ],
-                      ),
-                    ],
-                    maxY:
-                        [
-                          dailyCount,
-                          weeklyCount,
-                          monthlyCount,
-                        ].reduce((a, b) => a > b ? a : b) +
-                        1,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          _buildCard(
-            context: context,
-            title: "Habit Retention Rate",
+            title: "Weekly Habit Retention Rate",
             infoText:
                 "This line shows the percentage of habits you’ve maintained over the past weeks. A higher line means you’re sticking with your routines consistently — a clear measure of your long-term discipline.",
             child: _animatedChart(
@@ -704,6 +612,7 @@ class StatisticsPage extends ConsumerWidget {
 
       Icons.menu_book: 'Learning',
       Icons.brush: 'Learning',
+      Icons.laptop: 'Learning',
 
       Icons.self_improvement: 'Mind',
       Icons.favorite: 'Mind',
