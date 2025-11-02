@@ -82,7 +82,7 @@ class _HabitChatPageState extends State<HabitChatPage> {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.grey.shade200,
+          color: AppColors.accentDark,
           borderRadius: const BorderRadius.only(
             topRight: Radius.circular(20),
             topLeft: Radius.circular(20),
@@ -192,9 +192,12 @@ class _HabitChatPageState extends State<HabitChatPage> {
                   ),
                 ),
 
-                // 👇 Typing animation overlay
                 if (isTyping)
-                  Positioned(bottom: 75, left: 10, child: _buildTypingBubble()),
+                  Positioned(
+                    bottom: 100,
+                    left: 10,
+                    child: _buildTypingBubble(),
+                  ),
               ],
             ),
           ),
@@ -244,13 +247,13 @@ class _TypingDotState extends State<_TypingDot>
         width: 7,
         height: 7,
         decoration: BoxDecoration(
-          color: AppColors.accentDark.withOpacity(
+          color: AppColors.accentRed.withOpacity(
             0.9,
           ), // 👈 Darker, high contrast
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppColors.accentDark.withOpacity(0.3),
+              color: AppColors.accentDark,
               blurRadius: 2,
               offset: const Offset(0, 1),
             ),
