@@ -82,7 +82,7 @@ class _HabitChatPageState extends State<HabitChatPage> {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: AppColors.accentDark,
+          color: AppColors.surfaceDark,
           borderRadius: const BorderRadius.only(
             topRight: Radius.circular(20),
             topLeft: Radius.circular(20),
@@ -167,7 +167,7 @@ class _HabitChatPageState extends State<HabitChatPage> {
                           padding: const EdgeInsets.only(right: 4),
                           child: CircleAvatar(
                             radius: 20,
-                            backgroundColor: AppColors.accentDark,
+                            backgroundColor: AppColors.surfaceDark,
                             child: IconButton(
                               icon: const Icon(
                                 Icons.send_rounded,
@@ -253,7 +253,7 @@ class _TypingDotState extends State<_TypingDot>
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppColors.accentDark,
+              color: AppColors.surfaceDark,
               blurRadius: 2,
               offset: const Offset(0, 1),
             ),

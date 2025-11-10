@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,26 +22,31 @@ class HabitsPage extends ConsumerStatefulWidget {
 
 class _HabitsPageState extends ConsumerState<HabitsPage> {
   Future<void> _deleteHabit(String habitId) async {
-    final confirm = await showDialog<bool>(
+    final confirm = await showCupertinoDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Delete Habit'),
-            content: const Text('Are you sure you want to delete this habit?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.accentRed,
-                ),
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Delete'),
-              ),
-            ],
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: const Text('Delete Habit', style: TextStyle(fontSize: 16)),
+          content: const Padding(
+            padding: EdgeInsets.only(top: 8.0),
+            child: Text(
+              'Are you sure you want to delete this habit?',
+              style: TextStyle(fontSize: 14),
+            ),
           ),
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
     );
 
     if (confirm == true) {
@@ -51,100 +58,79 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
 
   Future<void> _editHabit(Habit habit) async {
     final nameController = TextEditingController(text: habit.name);
-    final descriptionController = TextEditingController(
-      text: habit.description,
-    );
+
     String selectedFrequency = habit.frequency;
     String? selectedIconCodePoint = habit.icon;
-    DateTime selectedStartDate = habit.startDate; // ✅ make start date editable
 
-    final result = await showDialog<bool>(
+    final result = await showCupertinoDialog<bool>(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, dialogSetState) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
+            return CupertinoAlertDialog(
               title: const Text(
                 'Edit Habit',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
+                  fontSize: 18,
                 ),
               ),
-              content: SingleChildScrollView(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.8,
+              content: Material(
+                color: Colors.transparent,
+                child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // --- Habit name ---
+                      const SizedBox(height: 12),
+                      // Name
                       TextField(
                         controller: nameController,
+                        style: const TextStyle(fontSize: 14),
                         decoration: InputDecoration(
                           labelText: 'Habit Name',
-                          labelStyle: const TextStyle(color: Colors.black54),
+                          labelStyle: const TextStyle(
+                            color: Colors.black54,
+                            fontSize: 13,
+                          ),
                           filled: true,
                           fillColor: Colors.grey.shade100,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(
                               color: AppColors.backgroundCream,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(
                               color: AppColors.primaryBlue,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
 
-                      // --- Description ---
-                      TextField(
-                        controller: descriptionController,
-                        maxLines: 3,
-                        decoration: InputDecoration(
-                          labelText: 'Description (Optional)',
-                          labelStyle: const TextStyle(color: Colors.black54),
-                          filled: true,
-                          fillColor: Colors.grey.shade100,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: AppColors.backgroundCream,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: AppColors.primaryBlue,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
+                      // Frequency
                       DropdownButtonFormField<String>(
                         value: selectedFrequency,
                         decoration: InputDecoration(
                           labelText: 'Frequency',
-                          labelStyle: const TextStyle(color: Colors.black54),
+                          labelStyle: const TextStyle(
+                            color: Colors.black54,
+                            fontSize: 13,
+                          ),
                           filled: true,
                           fillColor: Colors.grey.shade100,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(
                               color: AppColors.backgroundCream,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(
                               color: AppColors.primaryBlue,
                             ),
@@ -165,50 +151,20 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                           ),
                         ],
                         onChanged: (value) {
-                          if (value != null) selectedFrequency = value;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 16,
-                        ),
-                        leading: Icon(
-                          Icons.calendar_today_outlined,
-                          color: AppColors.primaryBlue,
-                        ),
-                        title: const Text('Start Date'),
-                        subtitle: Text(
-                          DateFormat(
-                            'E, MMM d, yyyy',
-                          ).format(selectedStartDate), // ✅ show current date
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        trailing: const Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          size: 16,
-                        ),
-                        onTap: () async {
-                          final newDate = await showDatePicker(
-                            context: context,
-                            initialDate: selectedStartDate,
-                            firstDate: DateTime(2020),
-                            lastDate: DateTime(2100),
-                          );
-                          if (newDate != null) {
-                            dialogSetState(() {
-                              selectedStartDate =
-                                  newDate; // ✅ update date inside dialog
-                            });
+                          if (value != null) {
+                            selectedFrequency = value;
                           }
                         },
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
 
+                      // Icon picker
                       ListTile(
-                        contentPadding: EdgeInsets.zero,
+                        dense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 4,
+                          horizontal: 8,
+                        ),
                         leading: Icon(
                           selectedIconCodePoint != null
                               ? IconData(
@@ -217,12 +173,15 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                               )
                               : Icons.emoji_emotions_outlined,
                           color: AppColors.primaryBlue,
-                          size: 30,
+                          size: 24,
                         ),
-                        title: const Text('Change Icon'),
+                        title: const Text(
+                          'Change Icon',
+                          style: TextStyle(fontSize: 14),
+                        ),
                         trailing: const Icon(
                           Icons.arrow_forward_ios_rounded,
-                          size: 16,
+                          size: 14,
                         ),
                         onTap: () async {
                           final IconData? newIcon = await _showIconPicker(
@@ -241,21 +200,17 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                 ),
               ),
               actions: [
-                TextButton(
+                CupertinoDialogAction(
                   onPressed: () => Navigator.pop(context, false),
-                  style: TextButton.styleFrom(foregroundColor: Colors.black54),
                   child: const Text('Cancel'),
                 ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryBlue,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                CupertinoDialogAction(
+                  isDefaultAction: true,
                   onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Save'),
+                  child: const Text(
+                    'Save',
+                    style: TextStyle(color: AppColors.primaryBlue),
+                  ),
                 ),
               ],
             );
@@ -265,14 +220,12 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
     );
 
     if (result == true && mounted) {
-      final newDescription = descriptionController.text.trim();
-
       final updatedHabit = Habit(
         id: habit.id,
         userId: habit.userId,
         name: nameController.text.trim(),
-        startDate: selectedStartDate, // ✅ new start date
-        description: newDescription.isEmpty ? null : newDescription,
+        startDate: habit.startDate,
+
         frequency: selectedFrequency,
         icon: selectedIconCodePoint,
         notificationEnabled: habit.notificationEnabled,
@@ -289,7 +242,10 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Habit updated successfully!'),
+          content: Text(
+            'Habit updated successfully!',
+            style: TextStyle(fontSize: 14),
+          ),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -300,46 +256,51 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
     final List<IconData> icons = [
       Icons.nightlight_round,
       Icons.water_drop,
-      Icons.laptop,
-      Icons.favorite,
       Icons.fitness_center,
-      Icons.menu_book,
       Icons.run_circle,
-      Icons.self_improvement,
       Icons.fastfood,
+      Icons.menu_book,
       Icons.brush,
+      Icons.self_improvement,
+      Icons.favorite,
     ];
 
-    return showDialog<IconData>(
+    return showCupertinoDialog<IconData>(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text('Select an Icon'),
-          content: SizedBox(
-            width: double.maxFinite,
-
-            child: GridView.builder(
-              shrinkWrap: true,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 5,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-              ),
-              itemCount: icons.length,
-              itemBuilder: (context, index) {
-                final icon = icons[index];
-                return InkWell(
-                  onTap: () {
-                    Navigator.pop(context, icon);
+        return CupertinoAlertDialog(
+          title: const Text('Select an Icon', style: TextStyle(fontSize: 16)),
+          content: Padding(
+            padding: const EdgeInsets.only(top: 12.0),
+            child: Material(
+              color: Colors.transparent,
+              child: SizedBox(
+                width: double.maxFinite,
+                height: 180,
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 5,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  itemCount: icons.length,
+                  itemBuilder: (context, index) {
+                    final icon = icons[index];
+                    return InkWell(
+                      onTap: () {
+                        Navigator.pop(context, icon);
+                      },
+                      borderRadius: BorderRadius.circular(10),
+                      child: Icon(icon, size: 24, color: AppColors.primaryBlue),
+                    );
                   },
-                  borderRadius: BorderRadius.circular(12),
-                  child: Icon(icon, size: 30, color: AppColors.primaryBlue),
-                );
-              },
+                ),
+              ),
             ),
           ),
           actions: [
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () => Navigator.pop(context, null),
               child: const Text('Cancel'),
             ),
@@ -347,21 +308,6 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
         );
       },
     );
-  }
-
-  Future<void> _signOut() async {
-    try {
-      await Supabase.instance.client.auth.signOut();
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Logged out successfully')));
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Logout failed: $e')));
-    }
   }
 
   Future<void> _toggleHabitCompletion(
@@ -399,7 +345,12 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
       setState(() {});
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error updating habit completion: $e')),
+        SnackBar(
+          content: Text(
+            'Error updating habit completion: $e',
+            style: const TextStyle(fontSize: 14),
+          ),
+        ),
       );
     }
   }
@@ -496,7 +447,7 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
       backgroundColor: AppColors.backgroundCream,
       appBar: AppBar(
         leading: IconButton(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           onPressed: () {
             Navigator.of(context).push(
               CupertinoDialogRoute(
@@ -505,16 +456,23 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
               ),
             );
           },
-          icon: const Icon(CupertinoIcons.person_fill, color: Colors.white),
+          icon: const Icon(
+            CupertinoIcons.person_fill,
+            color: Colors.white,
+            size: 22,
+          ),
         ),
         backgroundColor: AppColors.primaryBlue,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
         ),
-        title: const Text('My Habits', style: TextStyle(color: Colors.white)),
+        title: const Text(
+          'My Habits',
+          style: TextStyle(color: Colors.white, fontSize: 18),
+        ),
         actions: [
           IconButton(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(8),
             onPressed: () async {
               Navigator.of(context).push(
                 CupertinoModalPopupRoute(
@@ -524,49 +482,72 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                 ),
               );
             },
-            icon: Icon(CupertinoIcons.chat_bubble_2_fill, color: Colors.white),
+            icon: const Icon(
+              CupertinoIcons.chat_bubble_2_fill,
+              color: Colors.white,
+              size: 22,
+            ),
           ),
         ],
       ),
-
       body: habitsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error loading habits: $e')),
+        loading:
+            () => const Center(
+              child: SizedBox(
+                height: 28,
+                width: 28,
+                child: CircularProgressIndicator(strokeWidth: 2.5),
+              ),
+            ),
+        error:
+            (e, _) => Center(
+              child: Text(
+                'Error loading habits: $e',
+                style: const TextStyle(fontSize: 14),
+              ),
+            ),
         data: (habits) {
           if (habits.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     'You don’t have habits yet.',
-                    style: TextStyle(fontSize: 20),
+                    style: TextStyle(fontSize: 18),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   ElevatedButton(
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(
                         AppColors.accentRed,
                       ),
+                      padding: MaterialStateProperty.all(
+                        const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                      ),
                     ),
-
                     onPressed: () {
                       ref.read(bottomNavIndexProvider.notifier).state = 1;
                     },
-                    child: Text(
+                    child: const Text(
                       "Create One",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.white, fontSize: 14),
                     ),
                   ),
                 ],
               ),
             );
           }
+
           final selectedIndex = ref.watch(selectedDateIndexProvider);
           final today = DateTime.now();
           final selectedDate = today.add(Duration(days: selectedIndex));
           final todayDateOnly = DateUtils.dateOnly(today);
           final selectedDateOnly = DateUtils.dateOnly(selectedDate);
+
           String progressTitle;
           if (selectedDateOnly == todayDateOnly) {
             progressTitle = "Today's Progress";
@@ -577,6 +558,7 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
             progressTitle =
                 "Progress for ${DateFormat('MMM d').format(selectedDate)}";
           }
+
           final filteredHabits =
               habits.where((habit) {
                 if (DateUtils.dateOnly(
@@ -596,7 +578,6 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                       selectedDate.month,
                     );
 
-                    // Handle months with fewer days gracefully
                     final targetDay =
                         habit.startDate.day > daysInMonth
                             ? daysInMonth
@@ -613,61 +594,100 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
             onRefresh: () async => ref.invalidate(habitsProvider),
             child: Column(
               children: [
-                const HorizontalDateSelector(),
+                SizedBox(height: 16),
                 FutureBuilder<int>(
                   future: _getCompletedCount(selectedDate),
                   builder: (context, snapshot) {
                     final completed = snapshot.data ?? 0;
                     final total = filteredHabits.length;
-                    final progress = total == 0 ? 0 : completed / total;
+                    final progress = total == 0 ? 0.0 : completed / total;
+                    final percentage = (progress * 100).round();
 
                     return Container(
                       margin: const EdgeInsets.symmetric(
-                        horizontal: 16,
+                        horizontal: 14,
                         vertical: 8,
                       ),
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(30),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 5,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
                       ),
-                      child: Column(
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryBlueSoft.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppColors.borderSoft),
+                      ),
+                      child: Row(
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                progressTitle,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      progressTitle,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      '$completed of $total habits',
+                                      style: const TextStyle(
+                                        color: AppColors.textSecondary,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-
-                              Text(
-                                '$completed / $total completed',
-                                style: const TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: 14,
+                                const SizedBox(height: 12),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(999),
+                                  child: LinearProgressIndicator(
+                                    value: progress.toDouble(),
+                                    backgroundColor: Colors.white.withOpacity(
+                                      0.6,
+                                    ),
+                                    color: AppColors.primaryBlue,
+                                    minHeight: 6,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 10),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: LinearProgressIndicator(
-                              value: progress.toDouble(),
-                              backgroundColor: AppColors.backgroundCream,
+
+                          const SizedBox(width: 12),
+
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
                               color: AppColors.primaryBlue,
-                              minHeight: 10,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primaryBlue.withOpacity(0.3),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            alignment: Alignment.center,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '$percentage%',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -675,6 +695,12 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                     );
                   },
                 ),
+                SizedBox(height: 16),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 14),
+                  child: const HorizontalDateSelector(),
+                ),
+                SizedBox(height: 16),
                 Expanded(
                   child: ListView.builder(
                     itemCount: filteredHabits.length,
@@ -701,7 +727,6 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                             ),
                           ],
                         ),
-
                         child: FutureBuilder<bool>(
                           future: _isHabitCompletedOn(habit, selectedDate),
                           builder: (context, completionSnapshot) {
@@ -713,92 +738,133 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                               builder: (context, streakSnapshot) {
                                 final streak = streakSnapshot.data ?? 0;
 
-                                return Container(
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 12,
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
                                     vertical: 6,
                                   ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(30),
-                                    border: Border.all(
-                                      color: AppColors.backgroundCream,
-                                      width: 1.5,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 3),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(24),
+                                    child: BackdropFilter(
+                                      filter: ImageFilter.blur(
+                                        sigmaX: 16,
+                                        sigmaY: 16,
                                       ),
-                                    ],
-                                  ),
-                                  child: ListTile(
-                                    leading:
-                                        habit.icon != null
-                                            ? Icon(
-                                              IconData(
-                                                int.parse(habit.icon!),
-                                                fontFamily: 'MaterialIcons',
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                            24,
+                                          ),
+                                          // subtle frosted glass background
+                                          color: Colors.white.withOpacity(0.18),
+                                          border: Border.all(
+                                            color: Colors.white.withOpacity(
+                                              0.55,
+                                            ),
+                                            width: 1.2,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.08,
                                               ),
-                                              color: AppColors.primaryBlue,
-                                            )
-                                            : const Icon(Icons.circle_outlined),
-                                    title: Text(
-                                      habit.name,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    subtitle: Text(
-                                      'Frequency: ${habit.frequency}${streak > 0 ? '  •  Streak: $streak 🔥' : ''}',
-                                      style: const TextStyle(
-                                        color: Colors.black54,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-
-                                    trailing: IconButton(
-                                      icon: Icon(
-                                        isCompleted
-                                            ? Icons.check_circle
-                                            : Icons.circle_outlined,
-                                        color:
-                                            isCompleted
-                                                ? AppColors.primaryBlue
-                                                : Colors.grey,
-                                      ),
-                                      onPressed: () {
-                                        if (selectedDateOnly == todayDateOnly) {
-                                          _toggleHabitCompletion(
-                                            habit,
-                                            selectedDate,
-                                          );
-                                        } else {
-                                          showAdaptiveDialog(
-                                            context: context,
-                                            builder:
-                                                (
-                                                  context,
-                                                ) => CupertinoAlertDialog(
-                                                  title: Text(
-                                                    "You can not edit future habits ",
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        Navigator.of(
-                                                          context,
-                                                        ).pop();
-                                                      },
-                                                      child: Text("Close"),
+                                              blurRadius: 20,
+                                              offset: const Offset(0, 10),
+                                            ),
+                                          ],
+                                          // optional: very soft gradient to mimic Apple cards
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: [
+                                              Colors.white.withOpacity(0.28),
+                                              Colors.white.withOpacity(0.10),
+                                            ],
+                                          ),
+                                        ),
+                                        child: ListTile(
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 16,
+                                              ),
+                                          minVerticalPadding: 6,
+                                          leading: Container(
+                                            width: 36,
+                                            height: 36,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: AppColors.primaryBlue
+                                                  .withOpacity(0.10),
+                                            ),
+                                            alignment: Alignment.center,
+                                            child:
+                                                habit.icon != null
+                                                    ? Icon(
+                                                      IconData(
+                                                        int.parse(habit.icon!),
+                                                        fontFamily:
+                                                            'MaterialIcons',
+                                                      ),
+                                                      color:
+                                                          AppColors.primaryBlue,
+                                                      size: 22,
+                                                    )
+                                                    : const Icon(
+                                                      Icons.circle_outlined,
+                                                      size: 22,
+                                                      color: Colors.black54,
                                                     ),
-                                                  ],
-                                                ),
-                                          );
-                                        }
-                                      },
+                                          ),
+                                          title: Text(
+                                            habit.name,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 15,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                          subtitle: Text(
+                                            '${habit.frequency.toUpperCase()}${streak > 0 ? '  •  Streak: $streak 🔥' : ''}',
+                                            style: const TextStyle(
+                                              color: Colors.black54,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                          trailing: IconButton(
+                                            icon: Icon(
+                                              isCompleted
+                                                  ? Icons.check_circle
+                                                  : Icons.circle_outlined,
+                                              color:
+                                                  isCompleted
+                                                      ? AppColors.primaryBlue
+                                                      : Colors.black26,
+                                              size: 24,
+                                            ),
+                                            onPressed: () {
+                                              if (selectedDateOnly ==
+                                                  todayDateOnly) {
+                                                _toggleHabitCompletion(
+                                                  habit,
+                                                  selectedDate,
+                                                );
+                                              } else {
+                                                showAdaptiveDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (
+                                                        context,
+                                                      ) => const CupertinoAlertDialog(
+                                                        title: Text(
+                                                          "You can not edit future habits ",
+                                                        ),
+                                                      ),
+                                                );
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 );
@@ -828,7 +894,7 @@ class HorizontalDateSelector extends ConsumerWidget {
     final today = DateTime.now();
 
     return SizedBox(
-      height: 90,
+      height: 50,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: 14,
@@ -841,11 +907,11 @@ class HorizontalDateSelector extends ConsumerWidget {
                 () =>
                     ref.read(selectedDateIndexProvider.notifier).state = index,
             child: Container(
-              width: 70,
-              margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+              width: 50,
+              margin: const EdgeInsets.symmetric(horizontal: 4),
               decoration: BoxDecoration(
                 color: isSelected ? AppColors.accentRed : Colors.white,
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(60),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -855,13 +921,14 @@ class HorizontalDateSelector extends ConsumerWidget {
                     style: TextStyle(
                       color: isSelected ? Colors.white : Colors.black54,
                       fontWeight: FontWeight.w600,
+                      fontSize: 12,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 3),
                   Text(
                     DateFormat('d').format(date),
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 16,
                       color: isSelected ? Colors.white : Colors.black87,
                       fontWeight: FontWeight.bold,
                     ),
@@ -884,13 +951,15 @@ Widget buildActionButton({
   return Builder(
     builder: (context) {
       return Container(
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 3),
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: IconButton(
-          icon: Icon(icon, color: Colors.white),
+          icon: Icon(icon, color: Colors.white, size: 18),
+          padding: const EdgeInsets.all(8),
+          constraints: const BoxConstraints(minHeight: 36, minWidth: 36),
           onPressed: () async {
             final slidable = Slidable.of(context);
             slidable?.close();

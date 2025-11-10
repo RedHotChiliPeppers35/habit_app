@@ -1,4 +1,7 @@
 import 'dart:developer';
+import 'dart:ui';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_app/core/models/contants.dart';
@@ -38,6 +41,19 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
     'Art': Icons.brush,
   };
 
+  @override
+  void initState() {
+    super.initState();
+    _selectedIcon = _availableIcons.values.first;
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
   Future<void> _saveHabit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -75,8 +91,9 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
       _formKey.currentState!.reset();
       setState(() {
         _selectedFrequency = 'daily';
-        _selectedIcon = Icons.favorite;
+        _selectedIcon = _availableIcons.values.first;
         _enableNotification = false;
+        _selectedDate = DateTime.now();
       });
     } catch (e) {
       log(e.toString());
@@ -86,17 +103,79 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _selectedIcon = _availableIcons.values.first;
-  }
+  Future<DateTime?> _showCupertinoDatePicker(
+    BuildContext context,
+    DateTime initialDate,
+  ) async {
+    DateTime tempPickedDate = initialDate;
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _descriptionController.dispose();
-    super.dispose();
+    return showCupertinoModalPopup<DateTime>(
+      context: context,
+      builder: (ctx) {
+        return Container(
+          height: 300,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.12),
+                blurRadius: 18,
+                offset: const Offset(0, -6),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              SizedBox(
+                height: 44,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CupertinoButton(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      onPressed: () => Navigator.of(ctx).pop(null),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(color: Colors.black54),
+                      ),
+                    ),
+                    const Text(
+                      'Select Date',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    CupertinoButton(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      onPressed: () => Navigator.of(ctx).pop(tempPickedDate),
+                      child: const Text(
+                        'Done',
+                        style: TextStyle(color: AppColors.primaryBlue),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 0),
+              Expanded(
+                child: CupertinoDatePicker(
+                  mode: CupertinoDatePickerMode.date,
+                  initialDateTime: initialDate,
+                  minimumDate: DateTime(2020),
+                  maximumDate: DateTime(2100, 12, 31),
+                  onDateTimeChanged: (DateTime newDate) {
+                    tempPickedDate = newDate;
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -107,7 +186,6 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
       },
       child: Scaffold(
         backgroundColor: AppColors.backgroundCream,
-
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -115,24 +193,55 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
               key: _formKey,
               child: ListView(
                 children: [
-                  SizedBox(height: 20),
-                  _buildCard(
-                    padding: const EdgeInsets.all(
-                      16,
-                    ), // This card needs more padding
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Create a Habit',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Customize your habit with an icon, frequency, and start date.',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // ICON PICKER
+                  _buildGlassCard(
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Choose an Icon',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            const Text(
+                              'Choose an Icon',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const Spacer(),
+                            const Text(
+                              'swipe to see more',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 12),
                         SizedBox(
-                          height: 80,
+                          height: 70,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
                             itemCount: _availableIcons.length,
@@ -144,22 +253,45 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
                                 index,
                               );
                               final isSelected = icon == _selectedIcon;
-
                               return GestureDetector(
                                 onTap:
                                     () => setState(() => _selectedIcon = icon),
                                 child: Container(
-                                  padding: EdgeInsets.all(2),
                                   width: 70,
                                   margin: const EdgeInsets.symmetric(
                                     horizontal: 4,
                                   ),
                                   decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color:
+                                    borderRadius: BorderRadius.circular(999),
+                                    gradient:
                                         isSelected
-                                            ? AppColors.accentRed
-                                            : Colors.grey.shade200,
+                                            ? LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [
+                                                AppColors.accentRed.withOpacity(
+                                                  0.95,
+                                                ),
+                                                AppColors.accentRed.withOpacity(
+                                                  0.8,
+                                                ),
+                                              ],
+                                            )
+                                            : LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [
+                                                Colors.white.withOpacity(0.55),
+                                                Colors.white.withOpacity(0.22),
+                                              ],
+                                            ),
+                                    border: Border.all(
+                                      color:
+                                          isSelected
+                                              ? Colors.white.withOpacity(0.9)
+                                              : Colors.white.withOpacity(0.6),
+                                      width: 1.2,
+                                    ),
                                   ),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -169,27 +301,27 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
                                         color:
                                             isSelected
                                                 ? Colors.white
-                                                : Colors.black54,
-                                        size: 32,
+                                                : Colors.black87,
+                                        size: 30,
                                       ),
-                                      const SizedBox(height: 4),
+                                      const SizedBox(height: 6),
                                       Padding(
-                                        padding: EdgeInsetsGeometry.symmetric(
-                                          horizontal: 10,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
                                         ),
                                         child: Text(
-                                          textAlign: TextAlign.center,
                                           name,
-                                          maxLines: 3,
+                                          textAlign: TextAlign.center,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
-                                            fontSize: 10,
+                                            fontSize: 11,
                                             fontWeight: FontWeight.w600,
                                             color:
                                                 isSelected
                                                     ? Colors.white
-                                                    : Colors.black54,
+                                                    : Colors.black87,
                                           ),
-                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                     ],
@@ -202,14 +334,18 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
                       ],
                     ),
                   ),
-                  _buildCard(
+
+                  // NAME
+                  _buildGlassCard(
                     child: TextFormField(
                       controller: _nameController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Habit Name',
-                        prefixIcon: Icon(Icons.title),
+                        icon: Icon(Icons.title),
+                        iconColor: AppColors.primaryBlue,
                         border: InputBorder.none,
                       ),
+                      style: const TextStyle(fontSize: 14),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
                           return 'Please enter a habit name';
@@ -218,12 +354,15 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
                       },
                     ),
                   ),
-                  _buildCard(
+
+                  // FREQUENCY
+                  _buildGlassCard(
                     child: DropdownButtonFormField<String>(
                       value: _selectedFrequency,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Frequency',
-                        prefixIcon: Icon(Icons.repeat),
+                        icon: Icon(Icons.repeat),
+                        iconColor: AppColors.primaryBlue,
                         border: InputBorder.none,
                       ),
                       items: const [
@@ -244,54 +383,56 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
                       },
                     ),
                   ),
-                  _buildCard(
-                    padding: EdgeInsets.zero, // ListTile has its own padding
+
+                  // START DATE – Cupertino date picker
+                  _buildGlassCard(
+                    padding: EdgeInsets.zero,
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(
                         vertical: 8,
                         horizontal: 16,
                       ),
-                      leading: Icon(
+                      leading: const Icon(
                         Icons.calendar_today_outlined,
                         color: AppColors.primaryBlue,
                       ),
-                      title: const Text('Start Date'),
+                      title: const Text(
+                        'Start Date',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       subtitle: Text(
                         DateFormat('E, MMM d, yyyy').format(_selectedDate),
-                        style: const TextStyle(fontWeight: FontWeight.w600),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
                       ),
                       trailing: const Icon(
                         Icons.arrow_forward_ios_rounded,
                         size: 16,
                       ),
                       onTap: () async {
-                        final newDate = await showDatePicker(
-                          context: context,
-                          initialDate: _selectedDate,
-                          firstDate: DateTime(2020),
-                          lastDate: DateTime(2100),
+                        final newDate = await _showCupertinoDatePicker(
+                          context,
+                          _selectedDate,
                         );
                         if (newDate != null) {
                           setState(() {
-                            _selectedDate = newDate;
+                            _selectedDate = DateTime(
+                              newDate.year,
+                              newDate.month,
+                              newDate.day,
+                            );
                           });
                         }
                       },
                     ),
                   ),
-                  _buildCard(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                    child: TextFormField(
-                      controller: _descriptionController,
-                      decoration: InputDecoration(
-                        labelText: 'Description (Optional)',
-                        prefixIcon: Icon(Icons.description),
 
-                        border: InputBorder.none,
-                      ),
-                      maxLines: 3,
-                    ),
-                  ),
+                  const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 75),
                     child: ElevatedButton.icon(
@@ -301,6 +442,8 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
+                        elevation: 6,
+                        shadowColor: AppColors.primaryBlue.withOpacity(0.35),
                       ),
                       icon: const Icon(Icons.check, color: Colors.white),
                       label: const Text(
@@ -310,7 +453,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
                       onPressed: _saveHabit,
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -321,22 +464,42 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
   }
 }
 
-Widget _buildCard({required Widget child, EdgeInsetsGeometry? padding}) {
-  return Container(
-    margin: const EdgeInsets.only(bottom: 16),
-    padding: padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(30.0),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.07),
-          blurRadius: 8,
-          offset: const Offset(0, 2),
+/// GLASSMORPHIC CARD – matches the style of habit cards on HabitsPage
+Widget _buildGlassCard({required Widget child, EdgeInsetsGeometry? padding}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          padding: padding ?? const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            color: Colors.white.withOpacity(0.18),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.55),
+              width: 1.2,
+            ),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withOpacity(0.28),
+                Colors.white.withOpacity(0.10),
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 18,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: child,
         ),
-      ],
+      ),
     ),
-
-    child: child,
   );
 }
