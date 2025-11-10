@@ -55,7 +55,6 @@
 		<true/>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
-
 		<!-- 👇 Add these to stop native Firebase auto-initialization -->
 		<key>FirebaseAppDelegateProxyEnabled</key>
 		<false/>

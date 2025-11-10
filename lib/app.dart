@@ -12,15 +12,23 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final sessionAsync = ref.watch(authSessionProvider);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        useMaterial3: true, // optional, keep if you like M3
+        fontFamily: 'SFPro',
         scaffoldBackgroundColor: AppColors.backgroundCream,
-        fontFamily: 'SFPro', // since you already added SF Pro
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primaryBlue,
+        canvasColor: AppColors.backgroundCream,
+
+        // 🔵 No more fromSeed – fully controlled palette
+        colorScheme: const ColorScheme.light(
+          primary: AppColors.primaryBlue,
+          secondary: AppColors.accentRed,
           background: AppColors.backgroundCream,
+          surface: Colors.white,
         ),
+
         appBarTheme: const AppBarTheme(
           backgroundColor: AppColors.primaryBlue,
           foregroundColor: Colors.white,
