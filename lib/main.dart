@@ -25,7 +25,7 @@ Future<void> safeInitializeFirebase() async {
     );
     print('✅ Firebase initialized manually.');
   } catch (e) {
-    if (e.toString().contains('duplicate-app')) {
+    if (e.toString().contains('duplicate-ata.bapp')) {
       print('⚠️ Duplicate Firebase app detected — safe to ignore.');
     } else {
       print('❌ Firebase init failed: $e');

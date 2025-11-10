@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_app/core/models/contants.dart';
 import 'package:habit_app/core/providers/supabase_provider.dart';
+import 'package:habit_app/features/auth/view/auth_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfilePage extends ConsumerWidget {
@@ -180,7 +181,9 @@ class ProfilePage extends ConsumerWidget {
                                   child: const Text('Cancel'),
                                 ),
                                 TextButton(
-                                  onPressed: () => Navigator.pop(ctx, true),
+                                  onPressed: () {
+                                    Navigator.pop(ctx, true);
+                                  },
                                   child: const Text(
                                     'Delete',
                                     style: TextStyle(color: Colors.red),
@@ -223,6 +226,15 @@ class ProfilePage extends ConsumerWidget {
                               ),
                               behavior: SnackBarBehavior.floating,
                             ),
+                          );
+
+                          Navigator.of(context).pushAndRemoveUntil(
+                            PageRouteBuilder(
+                              pageBuilder: (_, __, ___) => const AuthPage(),
+                              transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,
+                            ),
+                            (route) => false,
                           );
                         }
                       } catch (e) {

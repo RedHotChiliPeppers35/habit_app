@@ -92,14 +92,14 @@ class StatsPage extends ConsumerWidget {
                     icon: Icons.bar_chart,
                     label: 'Total Habits',
                     value: '$totalHabits',
-                    color: AppColors.surfaceDark,
+                    color: AppColors.primaryBlue,
                   ),
                   const SizedBox(height: 12),
                   _buildStatCard(
                     icon: Icons.today,
                     label: 'Daily Habits',
                     value: '$dailyCount',
-                    color: AppColors.primaryBlue,
+                    color: AppColors.accentRed,
                     onTap: () {
                       Navigator.push(
                         context,

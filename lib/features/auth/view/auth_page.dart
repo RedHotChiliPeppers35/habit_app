@@ -176,7 +176,10 @@ class _SignUpFormState extends State<_SignUpForm> {
         data: {
           'name': _nameController.text.trim(),
           'surname': _surnameController.text.trim(),
-          'phone': _phoneController.text.trim(),
+          'phone':
+              _phoneController.text.trim().isEmpty
+                  ? null
+                  : _phoneController.text.trim(),
         },
       );
 
@@ -243,9 +246,6 @@ class _SignUpFormState extends State<_SignUpForm> {
                 borderRadius: BorderRadius.all(Radius.circular(30)),
               ),
             ),
-            validator:
-                (v) =>
-                    v == null || v.isEmpty ? 'Enter your phone number' : null,
           ),
           const SizedBox(height: 15),
           TextFormField(
