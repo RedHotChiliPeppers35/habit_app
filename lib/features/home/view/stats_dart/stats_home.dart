@@ -58,7 +58,7 @@ class StatsPage extends ConsumerWidget {
                     icon: Icons.bar_chart,
                     label: 'View Stats',
                     value: "",
-                    color: AppColors.accentRed,
+                    color: AppColors.surfaceDark,
                     onTap: () {
                       Navigator.of(context).push(
                         CupertinoPageRoute(
@@ -133,7 +133,7 @@ class StatsPage extends ConsumerWidget {
                     icon: Icons.calendar_month,
                     label: 'Monthly Habits',
                     value: '$monthlyCount',
-                    color: AppColors.surfaceDark,
+                    color: AppColors.accentRed,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -262,7 +262,7 @@ class StatsPage extends ConsumerWidget {
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         // her kartın kendi accent rengi
-                        color: color,
+                        color: AppColors.surfaceDark,
                       ),
                     ),
                 ],

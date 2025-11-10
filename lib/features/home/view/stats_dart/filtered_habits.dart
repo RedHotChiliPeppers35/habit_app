@@ -114,35 +114,6 @@ class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
                       ),
                       const SizedBox(height: 12),
 
-                      // Description
-                      TextField(
-                        controller: descriptionController,
-                        maxLines: 3,
-                        style: const TextStyle(fontSize: 14),
-                        decoration: InputDecoration(
-                          labelText: 'Description (Optional)',
-                          labelStyle: const TextStyle(
-                            color: Colors.black54,
-                            fontSize: 13,
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey.shade100,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              color: AppColors.backgroundCream,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              color: AppColors.primaryBlue,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
                       // Frequency
                       DropdownButtonFormField<String>(
                         value: selectedFrequency,
@@ -251,14 +222,12 @@ class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
     );
 
     if (result == true && mounted) {
-      final newDescription = descriptionController.text.trim();
-
       final updatedHabit = Habit(
         id: habit.id,
         userId: habit.userId,
         name: nameController.text.trim(),
         startDate: habit.startDate,
-        description: newDescription.isEmpty ? null : newDescription,
+
         frequency: selectedFrequency,
         icon: selectedIconCodePoint,
         notificationEnabled: habit.notificationEnabled,

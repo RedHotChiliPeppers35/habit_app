@@ -68,21 +68,22 @@ class StatisticsPage extends ConsumerWidget {
                     sections: [
                       PieChartSectionData(
                         value: dailyCount,
-                        color: AppColors.accentRed,
+
+                        color: Color(0xFFABE7B2),
                         titleStyle: TextStyle(color: Colors.black),
                         title: 'Daily',
                         radius: 50,
                       ),
                       PieChartSectionData(
                         value: weeklyCount,
-                        color: AppColors.primaryBlue,
+                        color: AppColors.accentRed,
                         title: 'Weekly',
                         titleStyle: TextStyle(color: Colors.black),
                         radius: 50,
                       ),
                       PieChartSectionData(
                         value: monthlyCount,
-                        color: Colors.greenAccent,
+                        color: Color(0xFFCBF3BB),
                         title: 'Monthly',
                         titleStyle: TextStyle(color: Colors.black),
                         radius: 50,
@@ -175,7 +176,7 @@ class StatisticsPage extends ConsumerWidget {
                             dotData: FlDotData(show: true),
                             belowBarData: BarAreaData(
                               show: true,
-                              color: AppColors.accentRed.withOpacity(0.15),
+                              color: Color(0xFF16476A).withOpacity(0.2),
                             ),
                             spots: List.generate(
                               rates.length,
@@ -298,7 +299,7 @@ class StatisticsPage extends ConsumerWidget {
 
                           final color = Color.lerp(
                             Colors.grey.shade200,
-                            AppColors.accentRed,
+                            Color(0XFF1D546C),
                             completionRate,
                           );
 
@@ -391,7 +392,7 @@ class StatisticsPage extends ConsumerWidget {
                             dotData: FlDotData(show: true),
                             belowBarData: BarAreaData(
                               show: true,
-                              color: AppColors.accentRed.withOpacity(0.15),
+                              color: Color(0xFF16476A).withOpacity(0.15),
                             ),
                             spots: List.generate(
                               retentionRates.length,
@@ -589,7 +590,7 @@ class StatisticsPage extends ConsumerWidget {
     return [
       PieChartSectionData(
         value: (categoryCount['Health']! / total) * 100,
-        color: Colors.greenAccent,
+        color: Color(0XFF1D546C),
         title: "Health",
 
         titleStyle: const TextStyle(
@@ -600,7 +601,7 @@ class StatisticsPage extends ConsumerWidget {
       ),
       PieChartSectionData(
         value: (categoryCount['Learning']! / total) * 100,
-        color: AppColors.primaryBlue,
+        color: Color(0xFFABE7B2),
 
         title: "Learning",
         titleStyle: const TextStyle(
@@ -622,7 +623,7 @@ class StatisticsPage extends ConsumerWidget {
       ),
       PieChartSectionData(
         value: (categoryCount['Other']! / total) * 100,
-        color: Colors.greenAccent,
+        color: Color(0xFFCBF3BB),
         title: "Other",
         titleStyle: const TextStyle(
           fontSize: 10,
