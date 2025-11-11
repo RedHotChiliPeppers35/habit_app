@@ -14,7 +14,7 @@ class MainPage extends ConsumerStatefulWidget {
 }
 
 class _MainPageState extends ConsumerState<MainPage> {
-  final List<Widget> _pages = const [HabitsPage(), AddHabitPage(), StatsPage()];
+  final List<Widget> _pages = [HabitsPage(), AddHabitPage(), StatsPage()];
 
   @override
   Widget build(BuildContext context) {

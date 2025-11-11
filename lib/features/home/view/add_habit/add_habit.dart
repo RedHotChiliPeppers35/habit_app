@@ -143,6 +143,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
                     const Text(
                       'Select Date',
                       style: TextStyle(
+                        inherit: false,
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
                         color: Colors.black87,
@@ -211,7 +212,6 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
                   // ICON PICKER
                   _buildGlassCard(
                     padding: const EdgeInsets.all(16),
@@ -334,7 +334,6 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
                       ],
                     ),
                   ),
-
                   // NAME
                   _buildGlassCard(
                     child: TextFormField(
@@ -354,7 +353,6 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
                       },
                     ),
                   ),
-
                   // FREQUENCY
                   _buildGlassCard(
                     child: DropdownButtonFormField<String>(
@@ -383,7 +381,6 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
                       },
                     ),
                   ),
-
                   // START DATE – Cupertino date picker
                   _buildGlassCard(
                     padding: EdgeInsets.zero,
@@ -431,7 +428,6 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
                       },
                     ),
                   ),
-
                   const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 75),
@@ -440,7 +436,7 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
                         backgroundColor: AppColors.primaryBlue,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                         elevation: 6,
                         shadowColor: AppColors.primaryBlue.withOpacity(0.35),
@@ -464,7 +460,6 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
   }
 }
 
-/// GLASSMORPHIC CARD – matches the style of habit cards on HabitsPage
 Widget _buildGlassCard({required Widget child, EdgeInsetsGeometry? padding}) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8),

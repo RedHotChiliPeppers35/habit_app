@@ -3,20 +3,41 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_app/core/models/contants.dart';
+import 'package:habit_app/core/providers/supabase_provider.dart';
 import 'package:habit_app/features/home/providers/habit_provider.dart';
 import 'package:habit_app/features/home/view/stats_dart/filtered_habits.dart';
 import 'package:habit_app/features/home/view/stats_dart/statistics.dart';
+import 'package:habit_app/features/onboarding/questionnaire_screen.dart';
 
 class StatsPage extends ConsumerWidget {
-  const StatsPage({super.key});
+  StatsPage({super.key});
+
+  final questionnaireCompletedProvider = FutureProvider<bool>((ref) async {
+    final user = ref.watch(currentUserProvider);
+    if (user == null) {
+      // No user: treat as completed so no "quiz" button
+      return true;
+    }
+
+    final repo = ref.read(questionnaireRepoProvider);
+    return repo.isCompleted(user.id);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final habitsAsync = ref.watch(habitsProvider);
 
+    final questionnaireCompletedAsync = ref.watch(
+      questionnaireCompletedProvider,
+    );
+
+    final hasTakenAssessment = questionnaireCompletedAsync.maybeWhen(
+      data: (completed) => completed,
+      orElse: () => true, // while loading, hide the button to avoid flicker
+    );
+
     return Scaffold(
       backgroundColor: AppColors.backgroundCream,
-
       body: SafeArea(
         child: habitsAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
@@ -67,8 +88,6 @@ class StatsPage extends ConsumerWidget {
                       );
                     },
                   ),
-                  const SizedBox(height: 20),
-                  const Divider(),
                   const SizedBox(height: 20),
                   const Text(
                     'Habit Overview',
@@ -147,8 +166,6 @@ class StatsPage extends ConsumerWidget {
                     },
                   ),
                   const SizedBox(height: 20),
-                  const Divider(),
-                  const SizedBox(height: 20),
                   const Text(
                     'Active Days Since First Habit',
                     style: TextStyle(
@@ -172,6 +189,42 @@ class StatsPage extends ConsumerWidget {
           },
         ),
       ),
+      floatingActionButton:
+          hasTakenAssessment
+              ? null // no FAB if already taken
+              : TextButton(
+                onPressed: () async {
+                  // Navigate to questionnaire
+                  final result = await Navigator.of(context).push<bool>(
+                    MaterialPageRoute(
+                      builder: (_) => const QuestionnaireScreen(),
+                    ),
+                  );
+
+                  // If questionnaire saved successfully (pop(true) in QuestionnaireScreen)
+                  if (result == true) {
+                    // Refresh the completion state so FAB disappears
+                    ref.invalidate(questionnaireCompletedProvider);
+                  }
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    color: AppColors.accentRed,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: const Text(
+                    'Take Onboarding Quiz',
+                    style: TextStyle(
+                      color: AppColors.backgroundCream,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
     );
   }
 

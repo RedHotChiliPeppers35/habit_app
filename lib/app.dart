@@ -5,6 +5,7 @@ import 'package:habit_app/core/models/contants.dart';
 import 'package:habit_app/features/auth/providers/auth_providers.dart';
 import 'package:habit_app/features/auth/view/auth_page.dart';
 import 'package:habit_app/features/home/view/home_page/home_page.dart';
+import 'package:habit_app/core/navigation.dart';
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -15,6 +16,7 @@ class MyApp extends ConsumerWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      navigatorKey: appNavigatorKey,
       theme: ThemeData(
         useMaterial3: true, // optional, keep if you like M3
         fontFamily: 'SFPro',

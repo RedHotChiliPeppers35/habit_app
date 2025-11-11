@@ -16,7 +16,7 @@ class ProfilePage extends ConsumerWidget {
       backgroundColor: AppColors.backgroundCream,
       appBar: AppBar(
         backgroundColor: AppColors.primaryBlue,
-        leading: BackButton(color: Colors.white),
+        leading: CloseButton(color: Colors.white),
         title: const Text(
           'Your Profile',
           style: TextStyle(color: Colors.white),

@@ -69,7 +69,7 @@ class StatisticsPage extends ConsumerWidget {
                       PieChartSectionData(
                         value: dailyCount,
 
-                        color: Color(0xFFABE7B2),
+                        color: AppColors.primaryBlue.withOpacity(0.6),
                         titleStyle: TextStyle(color: Colors.black),
                         title: 'Daily',
                         radius: 50,
@@ -169,7 +169,7 @@ class StatisticsPage extends ConsumerWidget {
                         ),
                         lineBarsData: [
                           LineChartBarData(
-                            color: AppColors.primaryBlue,
+                            color: AppColors.accentRed,
                             barWidth: 3,
                             isCurved: true,
                             isStrokeCapRound: true,
@@ -299,7 +299,7 @@ class StatisticsPage extends ConsumerWidget {
 
                           final color = Color.lerp(
                             Colors.grey.shade200,
-                            Color(0XFF1D546C),
+                            AppColors.accentRed,
                             completionRate,
                           );
 
@@ -385,7 +385,7 @@ class StatisticsPage extends ConsumerWidget {
                         ),
                         lineBarsData: [
                           LineChartBarData(
-                            color: AppColors.primaryBlue,
+                            color: AppColors.accentRed,
                             barWidth: 3,
                             isCurved: true,
                             isStrokeCapRound: true,

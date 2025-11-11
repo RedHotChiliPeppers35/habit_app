@@ -9,6 +9,7 @@ import 'package:habit_app/firebase_options.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:habit_app/core/env.dart';
 import 'package:habit_app/app.dart';
+import 'package:habit_app/features/onboarding/questionnaire_listener.dart';
 
 Future<void> safeInitializeFirebase() async {
   try {
@@ -60,5 +61,11 @@ Future<void> main() async {
   } catch (e) {
     print('⚠️ Firebase Messaging init error: $e');
   }
-  runApp(const ProviderScope(child: AuthLinkHandler(child: MyApp())));
+  runApp(
+    const ProviderScope(
+      child: AuthLinkHandler(
+        child: QuestionnaireOnLoginLauncher(child: MyApp()),
+      ),
+    ),
+  );
 }
