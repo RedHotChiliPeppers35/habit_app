@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:habit_app/core/link/auth_link_handler.dart';
@@ -61,6 +62,20 @@ Future<void> main() async {
   } catch (e) {
     print('⚠️ Firebase Messaging init error: $e');
   }
+
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent, // boyamayı appbar yapar
+      statusBarIconBrightness:
+          Brightness.light, // Android ikon rengi (açık/kapalı)
+      statusBarBrightness: Brightness.dark, // iOS saat/rakam rengi
+    ),
+  );
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.manual,
+    overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
+  );
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   runApp(
     const ProviderScope(
       child: AuthLinkHandler(

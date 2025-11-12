@@ -1,8 +1,11 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:developer';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_app/core/models/contants.dart';
 import 'package:habit_app/core/models/habits.dart';
@@ -185,272 +188,282 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
       onTap: () {
         FocusScope.of(context).unfocus();
       },
-      child: Scaffold(
-        backgroundColor: AppColors.backgroundCream,
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Form(
-              key: _formKey,
-              child: ListView(
-                children: [
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Create a Habit',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.dark, // koyu ikonlar (beyaz zeminde okunur)
+        child: SafeArea(
+          child: Scaffold(
+            backgroundColor: AppColors.backgroundCream,
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Form(
+                key: _formKey,
+                child: ListView(
+                  children: [
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Create a Habit',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Customize your habit with an icon, frequency, and start date.',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Customize your habit with an icon, frequency, and start date.',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  // ICON PICKER
-                  _buildGlassCard(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            const Text(
-                              'Choose an Icon',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                                color: AppColors.textPrimary,
+                    const SizedBox(height: 20),
+                    // ICON PICKER
+                    _buildGlassCard(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              const Text(
+                                'Choose an Icon',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  color: AppColors.textPrimary,
+                                ),
                               ),
-                            ),
-                            const Spacer(),
-                            const Text(
-                              'swipe to see more',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: AppColors.textPrimary,
+                              const Spacer(),
+                              const Text(
+                                'swipe to see more',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: AppColors.textPrimary,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          height: 70,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: _availableIcons.length,
-                            itemBuilder: (context, index) {
-                              final name = _availableIcons.keys.elementAt(
-                                index,
-                              );
-                              final icon = _availableIcons.values.elementAt(
-                                index,
-                              );
-                              final isSelected = icon == _selectedIcon;
-                              return GestureDetector(
-                                onTap:
-                                    () => setState(() => _selectedIcon = icon),
-                                child: Container(
-                                  width: 70,
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(999),
-                                    gradient:
-                                        isSelected
-                                            ? LinearGradient(
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                              colors: [
-                                                AppColors.accentRed.withOpacity(
-                                                  0.95,
-                                                ),
-                                                AppColors.accentRed.withOpacity(
-                                                  0.8,
-                                                ),
-                                              ],
-                                            )
-                                            : LinearGradient(
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                              colors: [
-                                                Colors.white.withOpacity(0.55),
-                                                Colors.white.withOpacity(0.22),
-                                              ],
-                                            ),
-                                    border: Border.all(
-                                      color:
-                                          isSelected
-                                              ? Colors.white.withOpacity(0.9)
-                                              : Colors.white.withOpacity(0.6),
-                                      width: 1.2,
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            height: 70,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: _availableIcons.length,
+                              itemBuilder: (context, index) {
+                                final name = _availableIcons.keys.elementAt(
+                                  index,
+                                );
+                                final icon = _availableIcons.values.elementAt(
+                                  index,
+                                );
+                                final isSelected = icon == _selectedIcon;
+                                return GestureDetector(
+                                  onTap:
+                                      () =>
+                                          setState(() => _selectedIcon = icon),
+                                  child: Container(
+                                    width: 70,
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 4,
                                     ),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        icon,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(999),
+                                      gradient:
+                                          isSelected
+                                              ? LinearGradient(
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
+                                                colors: [
+                                                  AppColors.accentRed
+                                                      .withOpacity(0.95),
+                                                  AppColors.accentRed
+                                                      .withOpacity(0.8),
+                                                ],
+                                              )
+                                              : LinearGradient(
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
+                                                colors: [
+                                                  Colors.white.withOpacity(
+                                                    0.55,
+                                                  ),
+                                                  Colors.white.withOpacity(
+                                                    0.22,
+                                                  ),
+                                                ],
+                                              ),
+                                      border: Border.all(
                                         color:
                                             isSelected
-                                                ? Colors.white
-                                                : Colors.black87,
-                                        size: 30,
+                                                ? Colors.white.withOpacity(0.9)
+                                                : Colors.white.withOpacity(0.6),
+                                        width: 1.2,
                                       ),
-                                      const SizedBox(height: 6),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          icon,
+                                          color:
+                                              isSelected
+                                                  ? Colors.white
+                                                  : Colors.black87,
+                                          size: 30,
                                         ),
-                                        child: Text(
-                                          name,
-                                          textAlign: TextAlign.center,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w600,
-                                            color:
-                                                isSelected
-                                                    ? Colors.white
-                                                    : Colors.black87,
+                                        const SizedBox(height: 6),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                          ),
+                                          child: Text(
+                                            name,
+                                            textAlign: TextAlign.center,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                              color:
+                                                  isSelected
+                                                      ? Colors.white
+                                                      : Colors.black87,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // NAME
+                    _buildGlassCard(
+                      child: TextFormField(
+                        controller: _nameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Habit Name',
+                          icon: Icon(Icons.title),
+                          iconColor: AppColors.primaryBlue,
+                          border: InputBorder.none,
+                        ),
+                        style: const TextStyle(fontSize: 14),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter a habit name';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    // FREQUENCY
+                    _buildGlassCard(
+                      child: DropdownButtonFormField<String>(
+                        value: _selectedFrequency,
+                        decoration: const InputDecoration(
+                          labelText: 'Frequency',
+                          icon: Icon(Icons.repeat),
+                          iconColor: AppColors.primaryBlue,
+                          border: InputBorder.none,
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'daily',
+                            child: Text('Daily'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'weekly',
+                            child: Text('Weekly'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'monthly',
+                            child: Text('Monthly'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() => _selectedFrequency = value);
+                          }
+                        },
+                      ),
+                    ),
+                    // START DATE – Cupertino date picker
+                    _buildGlassCard(
+                      padding: EdgeInsets.zero,
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 16,
+                        ),
+                        leading: const Icon(
+                          Icons.calendar_today_outlined,
+                          color: AppColors.primaryBlue,
+                        ),
+                        title: const Text(
+                          'Start Date',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                  // NAME
-                  _buildGlassCard(
-                    child: TextFormField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Habit Name',
-                        icon: Icon(Icons.title),
-                        iconColor: AppColors.primaryBlue,
-                        border: InputBorder.none,
-                      ),
-                      style: const TextStyle(fontSize: 14),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Please enter a habit name';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  // FREQUENCY
-                  _buildGlassCard(
-                    child: DropdownButtonFormField<String>(
-                      value: _selectedFrequency,
-                      decoration: const InputDecoration(
-                        labelText: 'Frequency',
-                        icon: Icon(Icons.repeat),
-                        iconColor: AppColors.primaryBlue,
-                        border: InputBorder.none,
-                      ),
-                      items: const [
-                        DropdownMenuItem(value: 'daily', child: Text('Daily')),
-                        DropdownMenuItem(
-                          value: 'weekly',
-                          child: Text('Weekly'),
+                        subtitle: Text(
+                          DateFormat('E, MMM d, yyyy').format(_selectedDate),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
                         ),
-                        DropdownMenuItem(
-                          value: 'monthly',
-                          child: Text('Monthly'),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 16,
                         ),
-                      ],
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() => _selectedFrequency = value);
-                        }
-                      },
+                        onTap: () async {
+                          final newDate = await _showCupertinoDatePicker(
+                            context,
+                            _selectedDate,
+                          );
+                          if (newDate != null) {
+                            setState(() {
+                              _selectedDate = DateTime(
+                                newDate.year,
+                                newDate.month,
+                                newDate.day,
+                              );
+                            });
+                          }
+                        },
+                      ),
                     ),
-                  ),
-                  // START DATE – Cupertino date picker
-                  _buildGlassCard(
-                    padding: EdgeInsets.zero,
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 8,
-                        horizontal: 16,
-                      ),
-                      leading: const Icon(
-                        Icons.calendar_today_outlined,
-                        color: AppColors.primaryBlue,
-                      ),
-                      title: const Text(
-                        'Start Date',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 75),
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryBlue,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          elevation: 6,
+                          shadowColor: AppColors.primaryBlue.withOpacity(0.35),
                         ),
-                      ),
-                      subtitle: Text(
-                        DateFormat('E, MMM d, yyyy').format(_selectedDate),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
+                        icon: const Icon(Icons.check, color: Colors.white),
+                        label: const Text(
+                          'Add Habit',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
+                        onPressed: _saveHabit,
                       ),
-                      trailing: const Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        size: 16,
-                      ),
-                      onTap: () async {
-                        final newDate = await _showCupertinoDatePicker(
-                          context,
-                          _selectedDate,
-                        );
-                        if (newDate != null) {
-                          setState(() {
-                            _selectedDate = DateTime(
-                              newDate.year,
-                              newDate.month,
-                              newDate.day,
-                            );
-                          });
-                        }
-                      },
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 75),
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryBlue,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 6,
-                        shadowColor: AppColors.primaryBlue.withOpacity(0.35),
-                      ),
-                      icon: const Icon(Icons.check, color: Colors.white),
-                      label: const Text(
-                        'Add Habit',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                      onPressed: _saveHabit,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             ),
           ),

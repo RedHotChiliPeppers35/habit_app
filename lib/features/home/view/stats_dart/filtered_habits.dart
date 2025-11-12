@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -8,7 +10,7 @@ import 'package:habit_app/core/models/contants.dart';
 import 'package:habit_app/features/home/providers/habit_provider.dart';
 import 'package:habit_app/core/models/habits.dart';
 import 'package:habit_app/core/providers/habit_service_provider.dart';
-import 'package:habit_app/features/home/view/home_page/habit_dialogs.dart';
+
 import 'package:intl/intl.dart';
 
 class FilteredHabitsPage extends ConsumerStatefulWidget {
@@ -58,9 +60,6 @@ class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
 
   Future<void> _editHabit(Habit habit) async {
     final nameController = TextEditingController(text: habit.name);
-    final descriptionController = TextEditingController(
-      text: habit.description,
-    );
     String selectedFrequency = habit.frequency;
     String? selectedIconCodePoint = habit.icon;
 
@@ -318,6 +317,10 @@ class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
     return Scaffold(
       backgroundColor: AppColors.backgroundCream,
       appBar: AppBar(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+        ),
+
         leading: IconButton(
           onPressed: Navigator.of(context).pop,
           icon: const Icon(Icons.chevron_left, color: Colors.white, size: 35),
@@ -359,7 +362,7 @@ class _FilteredHabitsPageState extends ConsumerState<FilteredHabitsPage> {
                   key: ValueKey(habit.id),
                   endActionPane: ActionPane(
                     motion: const ScrollMotion(),
-                    extentRatio: 0.5,
+                    extentRatio: 0.3,
                     children: [
                       buildActionButton(
                         icon: Icons.edit,
@@ -486,10 +489,10 @@ Widget buildActionButton({
   return Builder(
     builder: (context) {
       return Container(
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 3),
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: IconButton(
           icon: Icon(icon, color: Colors.white),

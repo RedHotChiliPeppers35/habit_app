@@ -25,3 +25,22 @@ class AppColors {
   static const Color textPrimary = Color(0xFF0F172A); // almost-black navy
   static const Color textSecondary = Color(0xFF6B7280); // neutral grey
 }
+
+class AppTextStyles {
+  // iOS-ish scale
+  static const largeTitle = TextStyle(
+    fontSize: 34,
+    fontWeight: FontWeight.w700,
+    height: 1.1,
+  );
+  static const title1 = TextStyle(fontSize: 28, fontWeight: FontWeight.w700);
+  static const title2 = TextStyle(fontSize: 22, fontWeight: FontWeight.w700);
+  static const title3 = TextStyle(fontSize: 20, fontWeight: FontWeight.w600);
+
+  static const headline = TextStyle(fontSize: 17, fontWeight: FontWeight.w600);
+  static const body = TextStyle(fontSize: 17, fontWeight: FontWeight.w400);
+  static const callout = TextStyle(fontSize: 16, fontWeight: FontWeight.w400);
+  static const subhead = TextStyle(fontSize: 15, fontWeight: FontWeight.w500);
+  static const footnote = TextStyle(fontSize: 13, fontWeight: FontWeight.w400);
+  static const caption2 = TextStyle(fontSize: 11, fontWeight: FontWeight.w600);
+}

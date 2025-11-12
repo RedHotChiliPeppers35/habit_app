@@ -1,4 +1,7 @@
+import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_app/core/models/contants.dart';
 import 'package:habit_app/features/home/view/add_habit/add_habit.dart';
@@ -23,68 +26,47 @@ class _MainPageState extends ConsumerState<MainPage> {
     return Scaffold(
       backgroundColor: AppColors.backgroundCream,
       body: _pages[currentIndex],
-      bottomNavigationBar: BottomAppBar(
-        color: AppColors.surfaceDark,
-        height: MediaQuery.of(context).size.height * 0.08,
-        child: Row(
-          children: <Widget>[
-            _buildBottomNavItem(
-              context,
-              ref: ref,
-              icon: Icons.check,
-              label: 'Habits',
-              index: 0,
-              currentIndex: currentIndex,
+      bottomNavigationBar: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 0, sigmaY: 20),
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 176, 208, 255),
             ),
-            Spacer(),
-            _buildBottomNavItem(
-              context,
-              ref: ref,
-              icon: Icons.add,
-              label: 'Add Habit',
-              index: 1,
-              currentIndex: currentIndex,
+            child: SafeArea(
+              top: false,
+              minimum: const EdgeInsets.only(top: 6),
+              child: CupertinoTabBar(
+                currentIndex: currentIndex,
+                onTap: (index) {
+                  ref.read(bottomNavIndexProvider.notifier).state = index;
+                  HapticFeedback.selectionClick();
+                },
+                backgroundColor: Colors.transparent,
+                border: const Border(),
+                activeColor: AppColors.accentRed,
+                inactiveColor: const Color.fromARGB(255, 29, 38, 60),
+                iconSize: 22,
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(CupertinoIcons.check_mark_circled),
+                    activeIcon: Icon(CupertinoIcons.check_mark_circled_solid),
+                    label: 'Habits',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(CupertinoIcons.add_circled),
+                    activeIcon: Icon(CupertinoIcons.add_circled_solid),
+                    label: 'Add Habit',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(CupertinoIcons.chart_bar),
+                    activeIcon: Icon(CupertinoIcons.chart_bar_alt_fill),
+                    label: 'Stats',
+                  ),
+                ],
+              ),
             ),
-            Spacer(),
-            _buildBottomNavItem(
-              context,
-              ref: ref,
-              icon: Icons.analytics,
-              label: 'Stats',
-              index: 2,
-              currentIndex: currentIndex,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNavItem(
-    BuildContext context, {
-    required WidgetRef ref,
-    required IconData icon,
-    required String label,
-    required int index,
-    required int currentIndex,
-  }) {
-    final isSelected = currentIndex == index;
-
-    final color = isSelected ? AppColors.primaryBlue : Colors.white;
-
-    return Expanded(
-      child: InkWell(
-        onTap: () {
-          ref.read(bottomNavIndexProvider.notifier).state = index;
-        },
-
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: color, size: 20),
-            Text(label, style: TextStyle(color: color, fontSize: 12)),
-          ],
+          ),
         ),
       ),
     );

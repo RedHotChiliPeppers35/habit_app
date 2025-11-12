@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_app/core/models/contants.dart';
@@ -16,6 +15,7 @@ class MyApp extends ConsumerWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+
       navigatorKey: appNavigatorKey,
       theme: ThemeData(
         useMaterial3: true, // optional, keep if you like M3

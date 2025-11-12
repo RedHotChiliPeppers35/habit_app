@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -370,19 +372,6 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
     return res?['is_completed'] ?? false;
   }
 
-  Future<int> _getCompletedCount(DateTime selectedDate) async {
-    final supabase = Supabase.instance.client;
-    final formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
-
-    final res = await supabase
-        .from('habit_logs')
-        .select('id')
-        .eq('date', formattedDate)
-        .eq('is_completed', true);
-
-    return res.length;
-  }
-
   Future<int> _getHabitStreak(Habit habit) async {
     if (habit.frequency != 'daily') {
       return 0;
@@ -437,6 +426,38 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
     }
 
     return streak;
+  }
+
+  Future<int> _getCompletedForEligibleHabits(
+    List<Habit> eligibleHabits,
+    DateTime selectedDate,
+  ) async {
+    if (eligibleHabits.isEmpty) return 0;
+
+    final supabase = Supabase.instance.client;
+    final formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+    final ids = eligibleHabits.map((h) => h.id).toList();
+
+    var query = supabase
+        .from('habit_logs')
+        .select('habit_id')
+        .eq('date', formattedDate)
+        .eq('is_completed', true);
+
+    // Prefer inFilter when available
+    try {
+      query = query.inFilter('habit_id', ids);
+    } catch (_) {
+      // Fallback: raw "in" operator expects a parenthesized, comma-separated list
+      final list = ids.map((e) => '"$e"').join(',');
+      query = query.filter('habit_id', 'in', '($list)');
+    }
+
+    final res = await query;
+
+    // Count each habit at most once
+    final completedIds = res.map((r) => r['habit_id'] as String).toSet();
+    return completedIds.length;
   }
 
   @override
@@ -596,13 +617,16 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
               children: [
                 SizedBox(height: 16),
                 FutureBuilder<int>(
-                  future: _getCompletedCount(selectedDate),
+                  future: _getCompletedForEligibleHabits(
+                    filteredHabits,
+                    selectedDate,
+                  ),
                   builder: (context, snapshot) {
                     final completed = snapshot.data ?? 0;
                     final total = filteredHabits.length;
-                    final progress = total == 0 ? 0.0 : completed / total;
+                    final progress =
+                        total == 0 ? 0.0 : (completed / total).clamp(0.0, 1.0);
                     final percentage = (progress * 100).round();
-
                     return Container(
                       margin: const EdgeInsets.symmetric(
                         horizontal: 14,
@@ -710,7 +734,7 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                         key: ValueKey(habit.id),
                         endActionPane: ActionPane(
                           motion: const ScrollMotion(),
-                          extentRatio: 0.5,
+                          extentRatio: 0.3,
                           children: [
                             buildActionButton(
                               icon: Icons.edit,
@@ -850,14 +874,29 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                                                 );
                                               } else {
                                                 showAdaptiveDialog(
+                                                  barrierDismissible: true,
                                                   context: context,
                                                   builder:
                                                       (
                                                         context,
-                                                      ) => const CupertinoAlertDialog(
-                                                        title: Text(
-                                                          "You can not edit future habits ",
+                                                      ) => CupertinoAlertDialog(
+                                                        title: const Text(
+                                                          "You can not edit future habits",
                                                         ),
+                                                        actions: [
+                                                          CupertinoDialogAction(
+                                                            isDefaultAction:
+                                                                true,
+                                                            onPressed:
+                                                                () =>
+                                                                    Navigator.of(
+                                                                      context,
+                                                                    ).pop(),
+                                                            child: const Text(
+                                                              'OK',
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                 );
                                               }
