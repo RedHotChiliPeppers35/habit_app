@@ -198,42 +198,60 @@ class StatsPage extends ConsumerWidget {
               );
             },
           ),
-          floatingActionButton:
-              hasTakenAssessment
-                  ? null // no FAB if already taken
-                  : TextButton(
-                    onPressed: () async {
-                      // Navigate to questionnaire
-                      final result = await Navigator.of(context).push<bool>(
-                        MaterialPageRoute(
-                          builder: (_) => const QuestionnaireScreen(),
-                        ),
-                      );
+          floatingActionButton: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            switchInCurve: Curves.easeOut,
+            switchOutCurve: Curves.easeIn,
+            transitionBuilder: (child, animation) {
+              final slide = Tween<Offset>(
+                begin: const Offset(0, 0.25),
+                end: Offset.zero,
+              ).animate(animation);
 
-                      // If questionnaire saved successfully (pop(true) in QuestionnaireScreen)
-                      if (result == true) {
-                        // Refresh the completion state so FAB disappears
-                        ref.invalidate(questionnaireCompletedProvider);
-                      }
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        color: AppColors.accentRed,
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      child: const Text(
-                        'Take Onboarding Quiz',
-                        style: TextStyle(
-                          color: AppColors.backgroundCream,
-                          fontSize: 16,
+              final fade = CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOut,
+              );
+
+              return FadeTransition(
+                opacity: fade,
+                child: SlideTransition(position: slide, child: child),
+              );
+            },
+            child:
+                hasTakenAssessment
+                    ? const SizedBox.shrink(key: ValueKey("no_fab"))
+                    : TextButton(
+                      key: const ValueKey("quiz_fab"),
+                      onPressed: () async {
+                        final result = await Navigator.of(context).push<bool>(
+                          MaterialPageRoute(
+                            builder: (_) => const QuestionnaireScreen(),
+                          ),
+                        );
+                        if (result == true) {
+                          ref.invalidate(questionnaireCompletedProvider);
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          color: AppColors.accentRed,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        child: const Text(
+                          'Take Onboarding Quiz',
+                          style: TextStyle(
+                            color: AppColors.backgroundCream,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ),
-                  ),
+          ),
         ),
       ),
     );

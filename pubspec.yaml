@@ -2,7 +2,7 @@ name: habit_app
 description: "A new Flutter project."
 publish_to: "none"
 
-version: 1.0.0+1
+version: 1.0.2+2
 
 environment:
   sdk: ^3.7.2
@@ -31,6 +31,7 @@ dependencies:
   flutter_native_splash: ^2.4.7
   google_generative_ai: ^0.4.3
   dash_chat_2: ^0.0.19
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -54,11 +55,9 @@ flutter:
         - asset: assets/fonts/SF-Pro-Text-Medium.otf
           weight: 500
 
-flutter_native_splash:
-  color: "#0B1220"
-  fullscreen: true
-  image: assets/icons/app_logo.png
-  android_12:
-    image: assets/icons/app_logo.png
-    color: "#6A7EFC"
-  web: false
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app_icon.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icons/app_icon.png"

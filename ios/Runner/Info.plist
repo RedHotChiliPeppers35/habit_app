@@ -49,16 +49,9 @@
 			<string>UIInterfaceOrientationLandscapeLeft</string>
 			<string>UIInterfaceOrientationLandscapeRight</string>
 		</array>
-		<key>flutter_apns.disable_swizzling</key>
-		<true/>
 		<key>UIStatusBarHidden</key>
 		<true/>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
-		<false/>
-		<!-- 👇 Add these to stop native Firebase auto-initialization -->
-		<key>FirebaseAppDelegateProxyEnabled</key>
-		<false/>
-		<key>FirebaseAutomaticInitializationEnabled</key>
 		<false/>
 	</dict>
 </plist>

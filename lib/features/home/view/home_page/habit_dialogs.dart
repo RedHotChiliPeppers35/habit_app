@@ -11,7 +11,7 @@ import 'package:habit_app/core/models/habits.dart';
 import 'package:habit_app/core/providers/habit_service_provider.dart';
 import 'package:habit_app/features/home/providers/habit_provider.dart';
 import 'package:habit_app/features/home/view/chat/chat_screen.dart';
-import 'package:habit_app/features/home/view/home_page/profile.dart';
+import 'package:habit_app/features/home/view/home_page/profile/profile.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

@@ -1,74 +1,74 @@
-import 'dart:io';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:habit_app/core/link/auth_link_handler.dart';
-import 'package:habit_app/firebase_options.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter/foundation.dart'; // kDebugMode
+
+import 'package:habit_app/core/link/auth_link_handler.dart';
 import 'package:habit_app/core/env.dart';
 import 'package:habit_app/app.dart';
 import 'package:habit_app/features/onboarding/questionnaire_listener.dart';
 
-Future<void> safeInitializeFirebase() async {
+Future<void> saveAPNsTokenToSupabase(String token) async {
+  final supabase = Supabase.instance.client;
+  final user = supabase.auth.currentUser;
+
+  // ✅ SAFE FLOW: don't write when no user
+  if (user == null) {
+    debugPrint("⚠️ No user yet, skipping token save.");
+    return;
+  }
+
+  final environment = kDebugMode ? 'sandbox' : 'production';
+
+  final row = <String, dynamic>{
+    'platform': 'ios',
+    'environment': environment,
+    'token': token,
+    'user_id': user.id, // ✅ always attach
+  };
+
   try {
-    // 🕒 Wait briefly in case native iOS initialization finishes first
-    await Future.delayed(const Duration(milliseconds: 500));
+    await supabase
+        .from('device_tokens')
+        .upsert(row, onConflict: 'token,platform,environment');
 
-    if (Firebase.apps.isNotEmpty) {
-      print('✅ Firebase already initialized (native or Dart).');
-      return;
-    }
-
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    print('✅ Firebase initialized manually.');
+    debugPrint('✅ Token upserted for logged-in user ($environment)');
   } catch (e) {
-    if (e.toString().contains('duplicate-ata.bapp')) {
-      print('⚠️ Duplicate Firebase app detected — safe to ignore.');
-    } else {
-      print('❌ Firebase init failed: $e');
-    }
+    debugPrint('❌ Error upserting APNs token to Supabase: $e');
   }
 }
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
+/// Listen for APNs token from iOS via MethodChannel
+void setupAPNSTokenListener() {
+  const channel = MethodChannel('apns_channel');
 
-  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
-
-  await safeInitializeFirebase();
-
-  try {
-    final messaging = FirebaseMessaging.instance;
-    final fcmToken = await messaging.getToken();
-    String? apnsToken;
-
-    if (!Platform.isIOS) {
-      apnsToken = null;
-    } else {
-      final isSimulator = Platform.environment.containsKey(
-        'SIMULATOR_DEVICE_NAME',
-      );
-      apnsToken = isSimulator ? null : await messaging.getAPNSToken();
+  channel.setMethodCallHandler((call) async {
+    if (call.method == 'apnsToken') {
+      final token = call.arguments as String;
+      debugPrint('📲 Received APNs token from iOS: $token');
+      await saveAPNsTokenToSupabase(token);
     }
+  });
+}
 
-    print('📱 FCM Token: $fcmToken');
-    print('🍎 APNs Token: $apnsToken');
-  } catch (e) {
-    print('⚠️ Firebase Messaging init error: $e');
-  }
+Future<void> main() async {
+  final binding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: binding);
+
+  await dotenv.load(fileName: ".env").catchError((_) {});
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+  debugPrint("✅ Supabase init completed");
+
+  setupAPNSTokenListener();
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent, // boyamayı appbar yapar
-      statusBarIconBrightness:
-          Brightness.light, // Android ikon rengi (açık/kapalı)
-      statusBarBrightness: Brightness.dark, // iOS saat/rakam rengi
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
     ),
   );
   SystemChrome.setEnabledSystemUIMode(
@@ -76,6 +76,7 @@ Future<void> main() async {
     overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
   );
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
   runApp(
     const ProviderScope(
       child: AuthLinkHandler(

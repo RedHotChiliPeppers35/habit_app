@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart'; // kDebugMode
 import 'package:habit_app/core/models/contants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -12,6 +15,48 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
+  /// ✅ SAFE: create or update token row AFTER login
+  Future<void> attachCurrentDeviceToUser() async {
+    final supabase = Supabase.instance.client;
+    final user = supabase.auth.currentUser;
+
+    if (user == null) {
+      debugPrint("⚠️ No user logged in. Skipping attach.");
+      return;
+    }
+
+    const channel = MethodChannel('apns_channel');
+    final apnsToken = await channel.invokeMethod<String>('getCurrentToken');
+
+    if (apnsToken == null) {
+      debugPrint("⚠️ No APNs token available to attach.");
+      return;
+    }
+
+    final environment = kDebugMode ? 'sandbox' : 'production';
+
+    final row = <String, dynamic>{
+      'platform': 'ios',
+      'environment': environment,
+      'token': apnsToken,
+      'user_id': user.id,
+    };
+
+    try {
+      await supabase
+          .from('device_tokens')
+          .upsert(row, onConflict: 'token,platform,environment');
+
+      debugPrint('✅ Upserted + attached token to user: ${user.id}');
+    } catch (e) {
+      debugPrint('❌ Error upserting device token to user: $e');
+    }
+  }
+
+  final authStateProvider = StreamProvider<AuthState>((ref) {
+    return Supabase.instance.client.auth.onAuthStateChange;
+  });
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,8 +76,8 @@ class _AuthPageState extends State<AuthPage> {
                         "Habit App",
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
-                      SizedBox(width: 10),
-                      Icon(
+                      const SizedBox(width: 10),
+                      const Icon(
                         Icons.track_changes,
                         size: 72,
                         color: Colors.deepOrange,
@@ -53,9 +98,8 @@ class _AuthPageState extends State<AuthPage> {
                                       email: email,
                                       password: password,
                                     );
-                                // await PushService.initAndRegisterToken();
+
                                 if (res.user != null && mounted) {
-                                  final supabase = Supabase.instance.client;
                                   final user = res.user!;
 
                                   // Check if profile already exists
@@ -70,12 +114,15 @@ class _AuthPageState extends State<AuthPage> {
                                   if (existing == null) {
                                     await supabase.from('profiles').insert({
                                       'id': user.id,
-                                      'name': '', // optional placeholder
-                                      'surname': '', // optional placeholder
-                                      'phone': '', // optional placeholder
+                                      'name': '',
+                                      'surname': '',
+                                      'phone': '',
                                       'email': user.email,
                                     });
                                   }
+
+                                  // ✅ attach token after login
+                                  await attachCurrentDeviceToUser();
                                 }
                               } on AuthException catch (e) {
                                 final msg = e.message.toLowerCase();
@@ -92,6 +139,7 @@ class _AuthPageState extends State<AuthPage> {
                                             'Login failed: ${e.message}',
                                           ),
                                         );
+
                                 if (mounted) {
                                   ScaffoldMessenger.of(
                                     context,
@@ -101,7 +149,6 @@ class _AuthPageState extends State<AuthPage> {
                             },
                           )
                           : _SignUpForm(
-                            // This function will be called on successful sign-up
                             onSignUpSuccess:
                                 () => setState(() => showSignIn = true),
                           ),
@@ -118,7 +165,7 @@ class _AuthPageState extends State<AuthPage> {
                       onPressed: () => setState(() => showSignIn = !showSignIn),
                       child: Text(
                         showSignIn ? 'Sign Up!' : 'Log In!',
-                        style: TextStyle(color: AppColors.accentRed),
+                        style: const TextStyle(color: AppColors.accentRed),
                       ),
                     ),
                   ],
@@ -135,6 +182,7 @@ class _AuthPageState extends State<AuthPage> {
 class _SignUpForm extends StatefulWidget {
   final VoidCallback onSignUpSuccess;
   const _SignUpForm({required this.onSignUpSuccess});
+
   @override
   State<_SignUpForm> createState() => _SignUpFormState();
 }
@@ -159,20 +207,16 @@ class _SignUpFormState extends State<_SignUpForm> {
     _phoneController.dispose();
     super.dispose();
   }
-  // In auth_page.dart -> class _SignUpFormState
 
   Future<void> _signUpUser(String email, String password) async {
-    // Add a mounted check for safety, especially with async operations
     if (!mounted) return;
 
     try {
       final supabase = Supabase.instance.client;
 
-      // Sign up the user and pass the additional data
       await supabase.auth.signUp(
         email: email,
         password: password,
-        // This 'data' is passed as raw_user_meta_data to your trigger
         data: {
           'name': _nameController.text.trim(),
           'surname': _surnameController.text.trim(),
@@ -299,7 +343,6 @@ class _SignUpFormState extends State<_SignUpForm> {
                         : "Passwords don’t match",
           ),
           const SizedBox(height: 20),
-
           FilledButton(
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all(AppColors.primaryBlue),
